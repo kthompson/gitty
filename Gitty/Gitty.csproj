@@ -73,14 +73,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commit.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Git.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Head.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="LooseObjectLoader.cs" />
+    <Compile Include="ObjectLoader.cs" />
+    <Compile Include="PackedObjectLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ref.cs" />
     <Compile Include="Repository.cs" />
+    <Compile Include="Tag.cs" />
+    <Compile Include="Tree.cs" />
+    <Compile Include="TreeEntry.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
