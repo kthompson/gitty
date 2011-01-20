@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitty", "Gitty\Gitty.csproj", "{9BE3C2DE-5CA0-469D-B3E4-F2B692CBE3FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitty.Tests", "Gitty.Tests\Gitty.Tests.csproj", "{5D8B107D-1D9B-4847-86E3-EC3555B9C410}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BE3C2DE-5CA0-469D-B3E4-F2B692CBE3FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BE3C2DE-5CA0-469D-B3E4-F2B692CBE3FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BE3C2DE-5CA0-469D-B3E4-F2B692CBE3FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BE3C2DE-5CA0-469D-B3E4-F2B692CBE3FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D8B107D-1D9B-4847-86E3-EC3555B9C410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D8B107D-1D9B-4847-86E3-EC3555B9C410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D8B107D-1D9B-4847-86E3-EC3555B9C410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D8B107D-1D9B-4847-86E3-EC3555B9C410}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
