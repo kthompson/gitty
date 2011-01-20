@@ -55,5 +55,23 @@ namespace Gitty
         {
             get { return new Head(this); }
         }
+
+        public object OpenObject(string id)
+        {
+            var loader = ObjectLoader.Create(this, id);
+            var info = loader.Load();
+            switch (info.Type)
+            {
+                case "commit":
+                    return new Commit(this, loader);
+                case "tree":
+                    return new Tree(this, loader);
+                case "blob":
+                    return new Blob(this, loader);
+                case "tag":
+                    return new Tag(this, loader);
+            }
+            return null;
+        }
     }
 }

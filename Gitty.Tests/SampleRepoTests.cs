@@ -150,6 +150,28 @@ namespace Gitty.Tests
 
         }
 
-        
+        [Test]
+        public void RepositoryCanOpenCommitObject()
+        {
+            var git = Git.Open(SampleRepoGit, true);
+            var id = "f5f1da3d5aa6aa03479df730c64d5525e5d6d5d8";
+            var obj = git.OpenObject(id);
+
+            Assert.IsInstanceOf(typeof(Commit), obj);
+
+            var commit = obj as Commit;
+            if(commit == null)
+                Assert.Fail();
+
+            Assert.AreEqual(id, commit.Id);
+
+            Assert.AreEqual("Kevin Thompson <mrunleaded@gmail.com> 1295412656 -0800", commit.Author);
+
+            Assert.AreEqual("Kevin Thompson <mrunleaded@gmail.com> 1295412656 -0800", commit.Commiter);
+
+            Assert.NotNull(commit.Tree);
+            Assert.AreEqual("7ee9583cd8b390caac802ece6c144314ef5fc3bf", commit.Tree.Id);
+
+        }
     }
 }
