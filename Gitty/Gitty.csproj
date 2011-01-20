@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="Git.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Head.cs" />

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Gitty
 {
-    class Blob 
+    public class Blob 
     {
         private readonly ObjectLoader _loader;
 
@@ -29,27 +29,77 @@ namespace Gitty
 
     public class Tree 
     {
+        private readonly Repository _repository;
         private readonly ObjectLoader _loader;
 
-        public Tree(Repository repository, ObjectLoader loader)
+        public string Id { get; private set; }
+
+        internal Tree(Repository repository, ObjectLoader loader)
         {
+            _repository = repository;
             _loader = loader;
             this.Id = loader.Id;
         }
 
-        public TreeEntry[] Items { get; private set; }
+        private readonly List<TreeEntry> _items = new List<TreeEntry>();
+        public IEnumerable<TreeEntry> Items
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _items.AsReadOnly();
+            }
+        }
 
-        public string Id { get; private set; }
+        private bool _loaded;
+        private void EnsureLoaded()
+        {
+            if (_loaded)
+                return;
 
+            this._loader.Load((stream, info) =>
+            {
+                var bytesRead = 0;
+                
+                while (bytesRead < info.Size)
+                {
+                    //read until space for mode
+                    var mode = stream.ReadUntil(c => c == ' ');
+                    bytesRead += mode.Length + 1;
+                    var name = stream.ReadUntil(c => c == '\0');
+                    bytesRead += name.Length + 1;
+                    var id = stream.ReadId();
+                    bytesRead += 20;
+                    this._items.Add(new TreeEntry(this._repository, id, name, mode));
+                }
+            });
+
+            this._loaded = true;
+        }
     }
 
     public class TreeEntry
     {
+        private readonly Repository _repository;
+
         public string Id { get; private set; }
-        public string Type { get; private set; }
         public string Mode { get; private set; }
         public string Name { get; private set; }
+
+        public string Type { get; private set; }
+
         public object Entry { get; private set; }
+
+        internal TreeEntry(Repository repository, string id, string name, string mode)
+        {
+            this._repository = repository;
+
+            this.Id = id;
+            this.Name = name;
+            this.Mode = mode;
+            this.Entry = this._repository.OpenObject(id);
+            this.Type = this.Entry is Tree ? "tree" : "blob";
+        }
     }
 
     public class Commit
@@ -164,27 +214,112 @@ namespace Gitty
         }
     }
 
-    class Tag
+    public class Tag
     {
+        private readonly Repository _repository;
         private readonly ObjectLoader _loader;
 
-        public Tag(Repository repository, ObjectLoader loader)
+        internal Tag(Repository repository, ObjectLoader loader)
         {
+            _repository = repository;
             _loader = loader;
             this.Id = loader.Id;
         }
 
         public string Id { get; private set; }
 
-        public string Name { get; private set; }
-        
-        public string Type { get; private set; }
-        public object Object { get; private set; }
+        private string _name;
+        public string Name
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _name;
+            }
+        }
 
-        public string Tagger { get; private set; }
-        public DateTime TaggedAt { get; private set; }
+        private string _type;
+        public string Type
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _type;
+            }
+        }
 
-        public string Message { get; private set; }
+        private object _object;
+        public object Object
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _object;
+            }
+        }
+
+        private string _tagger;
+        public string Tagger
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _tagger;
+            }
+        }
+
+        private string _message;
+        public string Message
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _message;
+            }
+        }
+
+        private bool _loaded;
+        private void EnsureLoaded()
+        {
+            if (_loaded)
+                return;
+
+            this._loader.Load((stream, info) =>
+            {
+                var bytesRead = 0;
+                var reader = new StreamReader(stream);
+                string line;
+                while (!string.IsNullOrEmpty(line = reader.ReadLine()))
+                {
+                    bytesRead += line.Length + 1; //add 1 for LF
+                    var parts = line.Split(new[] { ' ' }, 2);
+                    switch (parts[0])
+                    {
+                        case "object":
+                            this._object = _repository.OpenObject(parts[1]);
+                            break;
+                        case "type":
+                            this._type = parts[1];
+                            break;
+                        case "tag":
+                            this._name = parts[1];
+                            break;
+                        case "tagger":
+                            this._tagger = parts[1];
+                            break;
+                        default:
+                            throw new NotSupportedException(string.Format("{0} is not a supported tag field.", parts[0]));
+                    }
+                }
+
+                var messageSize = info.Size - bytesRead;
+                var buffer = new char[messageSize];
+                var read = reader.Read(buffer, 0, buffer.Length);
+                this._message = new string(buffer, 0, read);
+            });
+
+            this._loaded = true;
+        }
     }
 
     public class ObjectLoadInfo
@@ -192,7 +327,7 @@ namespace Gitty
         public string Type { get; private set; }
         public int Size { get; private set; }
 
-        public ObjectLoadInfo(string type, int size)
+        internal ObjectLoadInfo(string type, int size)
         {
             this.Type = type;
             this.Size = size;
@@ -289,7 +424,7 @@ namespace Gitty
     {
         public string Location { get; private set; }
 
-        public LooseObjectLoader(Repository repository, string id)
+        internal LooseObjectLoader(Repository repository, string id)
             : base(repository, id)
         {
             this.Location = Path.Combine(repository.Location, "objects", id.Substring(0, 2), id.Substring(2));
@@ -308,7 +443,7 @@ namespace Gitty
 
     class PackedObjectLoader : ObjectLoader
     {
-        public PackedObjectLoader(Repository repository, string id)
+        internal PackedObjectLoader(Repository repository, string id)
             : base(repository, id)
         {
         }
