@@ -8,11 +8,6 @@ namespace Gitty
         private readonly Repository _repository;
         private readonly ObjectLoader _loader;
 
-        public void GetContentStream(ObjectLoader.ContentLoader contentLoader)
-        {
-            this._loader.Load(contentLoader);
-        }
-
         public string Id { get; private set; }
 
         internal Blob(Repository repository, ObjectLoader loader)
@@ -21,6 +16,11 @@ namespace Gitty
 
             this._repository = repository;
             this._loader = loader;
+        }
+
+        public void GetContentStream(ObjectLoader.ContentLoader contentLoader)
+        {
+            this._loader.Load(contentLoader);
         }
     }
 }

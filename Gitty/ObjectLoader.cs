@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Linq;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 
@@ -20,7 +21,6 @@ namespace Gitty
     {
         public string Id { get; private set; }
         public Repository Repository { get; private set; }
-        public abstract bool Exists { get; }
 
         protected ObjectLoader(Repository repository, string id)
         {
@@ -28,57 +28,18 @@ namespace Gitty
             this.Id = id;
         }
 
-        protected abstract Stream OpenStream();
-
         public delegate void ContentLoader(Stream stream, ObjectLoadInfo loadInfo);
-        public ObjectLoadInfo Load(ContentLoader contentLoader = null)
-        {
-            
-            var size = 0;
-            var type = string.Empty;
-            var inner = OpenStream();
 
-            // this is a hack to get the DeflateStream to read properly
-            inner.ReadByte();
-            inner.ReadByte();
-
-            using (var stream = new DeflateStream(inner, CompressionMode.Decompress))
-            {
-                var sb = new StringBuilder();
-                var inHeader = true;
-
-                while (inHeader)
-                {
-                    var c = (char) stream.ReadByte();
-                    switch (c)
-                    {
-                        case ' ':
-                            type = sb.ToString();
-                            sb.Clear();
-                            continue;
-                        case '\0':
-                            size = int.Parse(sb.ToString());
-                            sb.Clear();
-                            inHeader = false;
-                            continue;
-                    }
-                    sb.Append(c);
-                }
-                var loadInfo = new ObjectLoadInfo(type, size);
-                if(contentLoader != null)
-                    contentLoader(stream, loadInfo);
-                return loadInfo;
-            }
-        }
+        public abstract ObjectLoadInfo Load(ContentLoader contentLoader = null);
 
         public static ObjectLoader Create(Repository repository, string id)
         {
-            ObjectLoader loader = new LooseObjectLoader(repository, id);
-            if (loader.Exists)
+            var loader = new LooseObjectLoader(repository, id);
+            if (File.Exists(loader.Location))
                 return loader;
 
-            loader = new PackedObjectLoader(repository, id);
-            return loader.Exists ? loader : null;
+            var pf = PackFile.FindAll(repository).Where(pack => pack.HasEntry(id)).FirstOrDefault();
+            return pf.GetObjectLoader(id);
         }
 
         public static ContentLoader DefaultContentLoader(Stream stream)

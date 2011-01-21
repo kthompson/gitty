@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commit.cs" />
+    <Compile Include="CompressionStream.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Git.cs" />
     <Compile Include="Blob.cs" />

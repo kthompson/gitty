@@ -1,0 +1,2 @@
+Add packed-refs support
+Add .git/config support

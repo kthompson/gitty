@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -48,6 +50,18 @@ namespace Gitty
                 return new DirectoryInfo(path).FullName;
 
             return null;
+        }
+
+        public static byte[] IdToByteArray(string id)
+        {
+            var array = new byte[20];
+
+            for (int i = 0; i < 40; i+=2)
+            {
+                array[i/2] = byte.Parse(id.Substring(i, 2), NumberStyles.HexNumber);
+            }
+            return array;
+
         }
     }
 }
