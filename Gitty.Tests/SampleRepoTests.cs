@@ -38,7 +38,6 @@ namespace Gitty.Tests
             Assert.AreEqual(isPacked, r.IsPacked);
             Assert.AreEqual(name, r.Name);
             Assert.AreEqual(remoteName, r.RemoteName);
-            Assert.AreEqual(repository, r.Repository);
             Assert.AreEqual(refType, r.Type);
             Assert.AreEqual(relativePath, r.RelativePath);
         }

@@ -10,8 +10,8 @@ namespace Gitty
     {
         public PackFile PackFile { get; private set; }
 
-        public PackedObjectLoader(Repository repository, PackFile packFile, string id)
-            : base(repository, id)
+        public PackedObjectLoader(PackFile packFile, string id)
+            : base(id)
         {
             this.PackFile = packFile;
         }
@@ -39,7 +39,7 @@ namespace Gitty
             }
         }
 
-        private static ObjectLoadInfo GetObjectInfo(FileStream file)
+        private static ObjectLoadInfo GetObjectInfo(Stream file)
         {
             var b = file.ReadByte();
             var type = (b & 0x70) >> 4;
@@ -51,7 +51,7 @@ namespace Gitty
             return new ObjectLoadInfo(typeString, size);
         }
 
-        private static int GetSize(FileStream file, int b)
+        private static int GetSize(Stream file, int b)
         {
             var size = (b & 0xF);
             var sizeBits = 4;
@@ -122,18 +122,14 @@ namespace Gitty
             }
         }
 
-        public Repository Repository { get; set; }
         public string Location { get; private set; }
         public string IndexLocation { get; private set; }
 
-
-        public PackFile(Repository repository, string packName)
+        public PackFile(string packFile)
         {
-            var packFolder = Path.Combine(repository.Location, "objects", "pack");
-
-            this.Repository = repository;
-            this.Location = Path.Combine(packFolder, packName + ".pack");
-            this.IndexLocation = Path.Combine(packFolder, packName + ".idx");
+            this.Location = Helper.MakeAbsolutePath(packFile);
+            if (this.Location.EndsWith(".pack"))
+                this.IndexLocation = this.Location.Substring(0, this.Location.Length - 4) + "idx";
         }
 
         private void EnsureLoaded()
@@ -158,8 +154,13 @@ namespace Gitty
 
         internal static IEnumerable<PackFile> FindAll(Repository repository)
         {
-            var packFolder = Path.Combine(repository.Location, "objects", "pack");
-            return new DirectoryInfo(packFolder).EnumerateFiles("*.pack").Select(pf => new PackFile(repository, pf.Name));
+            var packs = new DirectoryInfo(repository.PacksLocation);
+            if(packs.Exists)
+                return packs
+                      .EnumerateFiles("*.pack")
+                      .Select(pf => new PackFile(pf.FullName));
+
+            return new PackFile[] {};
         }
 
         public bool HasEntry(string id)
@@ -169,7 +170,7 @@ namespace Gitty
 
         public ObjectLoader GetObjectLoader(string id)
         {
-            return new PackedObjectLoader(this.Repository, this, id);
+            return new PackedObjectLoader(this, id);
         }
     }
 

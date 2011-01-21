@@ -23,19 +23,17 @@ namespace Gitty
         public string RemoteName { get; private set; }
         public bool IsPacked { get; private set; }
         public RefType Type { get; private set; }
-        public Repository Repository { get; private set; }
         public string Id { get; private set; }
         public string RelativePath { get; private set; }
         public string Location { get; private set; }
 
-        public Ref(Repository repository, string location, string id = null)
+        public Ref(string repositoryLocation, string location, string id = null)
         {
-            this.Repository = repository;
             this.Location = location;
             this.IsPacked = id != null;
             this.Id = id;
 
-            var relPath = Helper.MakeRelativePath(Path.Combine(this.Repository.Location, Refs), location).Replace('\\', '/');
+            var relPath = Helper.MakeRelativePath(Path.Combine(repositoryLocation, Refs), location).Replace('\\', '/');
 
             if (relPath.StartsWith(Tags))
             {

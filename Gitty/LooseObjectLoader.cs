@@ -9,10 +9,10 @@ namespace Gitty
     {
         public string Location { get; private set; }
 
-        internal LooseObjectLoader(Repository repository, string id)
-            : base(repository, id)
+        internal LooseObjectLoader(string objectsPath, string id)
+            : base(id)
         {
-            this.Location = Path.Combine(repository.Location, "objects", id.Substring(0, 2), id.Substring(2));
+            this.Location = Path.Combine(objectsPath, id.Substring(0, 2), id.Substring(2));
         }
 
         public override ObjectLoadInfo Load(ContentLoader contentLoader = null)

@@ -16,18 +16,33 @@ namespace Gitty
             get { return this.Ref == null; }
         }
 
-        public Ref Ref { get; private set; }
-        public string Id { get; private set; }
+        private Ref _ref;
+        public Ref Ref
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _ref;
+            }
+        }
+
+        private string _id;
+        public string Id
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _id;
+            }
+        }
 
         public Head(Repository repository)
         {
             this.Repository = repository;
             this.Location = Path.Combine(repository.Location, "HEAD");
-
-            this.LoadHead();
         }
 
-        private void LoadHead()
+        private void EnsureLoaded()
         {
             string data;
             using (var reader = new StreamReader(File.OpenRead(this.Location)))
@@ -38,12 +53,12 @@ namespace Gitty
             if (data.StartsWith("ref: "))
             {
                 data = data.Substring("ref: ".Length);
-                this.Ref = this.Repository.Refs.Where(r => r.RelativePath == data).First();
-                this.Id = this.Ref.Id;
+                this._ref = this.Repository.Refs.Where(r => r.RelativePath == data).First();
+                this._id = this._ref.Id;
             }
             else
             {
-                this.Id = data;
+                this._id = data;
             }
         }
     }

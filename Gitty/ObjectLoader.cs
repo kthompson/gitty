@@ -20,11 +20,9 @@ namespace Gitty
     public abstract class ObjectLoader
     {
         public string Id { get; private set; }
-        public Repository Repository { get; private set; }
 
-        protected ObjectLoader(Repository repository, string id)
+        protected ObjectLoader(string id)
         {
-            this.Repository = repository;
             this.Id = id;
         }
 
@@ -34,12 +32,15 @@ namespace Gitty
 
         public static ObjectLoader Create(Repository repository, string id)
         {
-            var loader = new LooseObjectLoader(repository, id);
+            var loader = new LooseObjectLoader(repository.ObjectsLocation, id);
             if (File.Exists(loader.Location))
                 return loader;
 
             var pf = PackFile.FindAll(repository).Where(pack => pack.HasEntry(id)).FirstOrDefault();
-            return pf.GetObjectLoader(id);
+            if (pf != null)
+                return pf.GetObjectLoader(id);
+
+            return null;
         }
 
         public static ContentLoader DefaultContentLoader(Stream stream)
