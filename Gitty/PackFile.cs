@@ -48,16 +48,20 @@ namespace Gitty
                 this.IndexLocation = this.Location.Substring(0, this.Location.Length - 4) + "idx";
         }
 
+        private bool _loaded;
         private void EnsureLoaded()
         {
+            if (_loaded)
+                return;
+
             using (var reader = new BinaryReader(File.OpenRead(this.Location)))
             {
                 var sig = reader.ReadBytes(4);
 
                 if (!(sig[0] == 'P' &&
                       sig[1] == 'A' &&
-                      sig[1] == 'C' &&
-                      sig[1] == 'K'))
+                      sig[2] == 'C' &&
+                      sig[3] == 'K'))
                 {
                     throw new InvalidOperationException("not a pack file");
                 }
@@ -66,6 +70,7 @@ namespace Gitty
                 this._entryCount = reader.ReadInt32();
                 this._index = new PackIndex(this.IndexLocation, this.EntryCount);
             }
+            this._loaded = true;
         }
 
         internal static IEnumerable<PackFile> FindAll(Repository repository)
