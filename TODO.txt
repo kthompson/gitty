@@ -1,2 +1,3 @@
 Add packed-refs support
 Add .git/config support
+Add support to switch branches
