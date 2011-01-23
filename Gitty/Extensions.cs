@@ -2,12 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Gitty
 {
     public static class Extensions
     {
+
+
+        public static int ReadBigInt32(this BinaryReader reader)
+        {
+            return IPAddress.HostToNetworkOrder(reader.ReadInt32());
+        }
+
+        public static short ReadBigInt16(this BinaryReader reader)
+        {
+            return IPAddress.HostToNetworkOrder(reader.ReadInt16());
+        }
+
         public static string ReadUntil(this Stream stream, Predicate<int> predicate)
         {
             var sb = new StringBuilder();

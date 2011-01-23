@@ -80,6 +80,8 @@
     <Compile Include="Blob.cs" />
     <Compile Include="Head.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Index.cs" />
+    <Compile Include="IndexEntry.cs" />
     <Compile Include="LooseObjectLoader.cs" />
     <Compile Include="ObjectLoader.cs" />
     <Compile Include="PackedObjectLoader.cs" />

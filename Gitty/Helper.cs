@@ -63,5 +63,17 @@ namespace Gitty
             return array;
 
         }
+
+        public static string ByteArrayToId(IEnumerable<byte> sha)
+        {
+            var sb = new StringBuilder(40);
+
+            foreach (var b in sha)
+            {
+                sb.Append(Convert.ToString(b, 16).PadLeft(2, '0'));
+            }
+
+            return sb.ToString();
+        }
     }
 }

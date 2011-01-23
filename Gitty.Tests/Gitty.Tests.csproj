@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GitTests.cs" />
+    <Compile Include="IndexTests.cs" />
     <Compile Include="PackTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="SampleRepoTests.cs" />
