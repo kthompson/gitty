@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Gitty
 {
     public class Repository
     {
-        public Repository(string gitDir)
+        public string WorkingDirectory { get; private set; }
+
+        internal Repository(string workingDirectory, string gitDirectory = null, bool create = false)
         {
-            this.Location = Helper.MakeAbsolutePath(gitDir);
+            this.WorkingDirectory = Helper.MakeAbsolutePath(workingDirectory);
+
+            this.Location = Helper.MakeAbsolutePath(gitDirectory ?? Path.Combine(workingDirectory, ".git"));
 
             this.ObjectsLocation = Path.Combine(this.Location, "objects");
             this.PacksLocation = Path.Combine(this.ObjectsLocation, "pack");
@@ -19,6 +24,58 @@ namespace Gitty
             this.HeadsLocation = Path.Combine(this.RefsLocation, Ref.Heads);
             this.RemotesLocation = Path.Combine(this.RefsLocation, Ref.Remotes);
             this.TagsLocation = Path.Combine(this.RefsLocation, Ref.Tags);
+
+            if (!create) return;
+
+            //.git
+            Directory.CreateDirectory(this.Location);
+            EmbeddedToFile("Gitty.Content.config", Path.Combine(this.Location, "config"));
+            EmbeddedToFile("Gitty.Content.description", Path.Combine(this.Location, "description"));
+            EmbeddedToFile("Gitty.Content.HEAD", Path.Combine(this.Location, "HEAD"));
+            //.git/hooks/
+            Directory.CreateDirectory(Path.Combine(this.Location, "hooks"));
+            //.git/info/
+            var info = Path.Combine(this.Location, "info");
+            Directory.CreateDirectory(info);
+            EmbeddedToFile("Gitty.Content.info.exclude", Path.Combine(info, "exclude"));
+            //.git/objects
+            Directory.CreateDirectory(this.ObjectsLocation);
+            //.git/objects/info
+            Directory.CreateDirectory(Path.Combine(this.ObjectsLocation, "info"));
+            //.git/objects/pack
+            Directory.CreateDirectory(this.PacksLocation);
+            //.git/refs
+            Directory.CreateDirectory(this.RefsLocation);
+            //.git/refs/heads
+            Directory.CreateDirectory(this.HeadsLocation);
+            //.git/refs/tags
+            Directory.CreateDirectory(this.TagsLocation);
+            //.git/hooks/
+            var hooks = Path.Combine(this.Location, "hooks");
+            EmbeddedToFile("Gitty.Content.hooks.applypatch-msg.sample", Path.Combine(hooks, "applypatch-msg.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.commit-msg.sample", Path.Combine(hooks, "commit-msg.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.post-commit.sample", Path.Combine(hooks, "post-commit.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.post-receive.sample", Path.Combine(hooks, "post-receive.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.post-update.sample", Path.Combine(hooks, "post-update.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.pre-applypatch.sample", Path.Combine(hooks, "pre-applypatch.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.pre-commit.sample", Path.Combine(hooks, "pre-commit.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.pre-rebase.sample", Path.Combine(hooks, "pre-rebase.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.prepare-commit-msg.sample", Path.Combine(hooks, "prepare-commit-msg.sample"));
+            EmbeddedToFile("Gitty.Content.hooks.update.sample", Path.Combine(hooks, "update.sample"));
+        }
+
+        private static void EmbeddedToFile(string resource, string file)
+        {
+            using (var stream = File.Create(file))
+            {
+                using(var res = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
+                {
+                    if (res == null) 
+                        throw new ArgumentException("not a valid resource", "resource");
+                    
+                    res.CopyTo(stream);
+                }
+            }
         }
 
         public IEnumerable<Ref> Remotes

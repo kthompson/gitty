@@ -94,6 +94,22 @@
     <Compile Include="Tree.cs" />
     <Compile Include="TreeEntry.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content\config" />
+    <EmbeddedResource Include="Content\description" />
+    <EmbeddedResource Include="Content\HEAD" />
+    <EmbeddedResource Include="Content\hooks\applypatch-msg.sample" />
+    <EmbeddedResource Include="Content\hooks\commit-msg.sample" />
+    <EmbeddedResource Include="Content\hooks\post-commit.sample" />
+    <EmbeddedResource Include="Content\hooks\post-receive.sample" />
+    <EmbeddedResource Include="Content\hooks\post-update.sample" />
+    <EmbeddedResource Include="Content\hooks\pre-applypatch.sample" />
+    <EmbeddedResource Include="Content\hooks\pre-commit.sample" />
+    <EmbeddedResource Include="Content\hooks\pre-rebase.sample" />
+    <EmbeddedResource Include="Content\hooks\prepare-commit-msg.sample" />
+    <EmbeddedResource Include="Content\hooks\update.sample" />
+    <EmbeddedResource Include="Content\info\exclude" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
