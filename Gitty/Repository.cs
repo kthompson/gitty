@@ -114,13 +114,26 @@ namespace Gitty
         public string RemotesLocation { get; private set; }
         public string TagsLocation { get; private set; }
         public string PacksLocation { get; private set; }
+        public string ObjectsLocation { get; private set; }
 
         public Head Head
         {
             get { return new Head(this); }
         }
 
-        public string ObjectsLocation { get; private set; }
+        public Index Index
+        {
+            get{ return new Index(Path.Combine(this.Location, "index"));}
+        }
+
+        public Status Status
+        {
+            get
+            {
+                return new Status(this);
+            }
+        }
+
 
         public object OpenObject(string id)
         {
