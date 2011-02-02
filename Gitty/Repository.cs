@@ -10,11 +10,20 @@ namespace Gitty
     {
         public string WorkingDirectory { get; private set; }
 
-        internal Repository(string workingDirectory, string gitDirectory = null, bool create = false)
+        internal Repository(string workingDirectory = null, string gitDirectory = null, bool create = false)
         {
-            this.WorkingDirectory = Helper.MakeAbsolutePath(workingDirectory);
+            if (workingDirectory != null)
+            {
+                this.WorkingDirectory = Helper.MakeAbsolutePath(workingDirectory);
 
-            this.Location = Helper.MakeAbsolutePath(gitDirectory ?? Path.Combine(workingDirectory, ".git"));
+                gitDirectory = gitDirectory ?? Path.Combine(workingDirectory, ".git");
+            }
+
+            if (gitDirectory == null)
+                throw new ArgumentNullException("gitDirectory",
+                                                "You must specify at least workingDirectory or gitDirectory");
+
+            this.Location = Helper.MakeAbsolutePath(gitDirectory);
 
             this.ObjectsLocation = Path.Combine(this.Location, "objects");
             this.PacksLocation = Path.Combine(this.ObjectsLocation, "pack");
@@ -25,7 +34,8 @@ namespace Gitty
             this.RemotesLocation = Path.Combine(this.RefsLocation, Ref.Remotes);
             this.TagsLocation = Path.Combine(this.RefsLocation, Ref.Tags);
 
-            if (!create) return;
+            if (!create) 
+                return;
 
             //.git
             Directory.CreateDirectory(this.Location);
@@ -108,6 +118,11 @@ namespace Gitty
             return Helper.GetLocations(location).Select(path => new Ref(this.Location, path));
         }
 
+        public bool IsBare
+        {
+            get { return this.WorkingDirectory == null; }
+        }
+
         public string Location { get; private set; }
         public string RefsLocation { get; private set; }
         public string HeadsLocation { get; private set; }
@@ -134,6 +149,48 @@ namespace Gitty
             }
         }
 
+        public RepositoryState State
+        {
+            get
+            {
+                if(this.IsBare)
+                    return RepositoryState.Bare;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, ".dotest")))
+                    return RepositoryState.Rebasing;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, ".dotest-merge")))
+                    return RepositoryState.RebasingInteractive;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply", "rebasing")))
+                    return RepositoryState.RebasingRebasing;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply", "applying")))
+                    return RepositoryState.Apply;
+
+                if (Directory.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply")))
+                    return RepositoryState.Rebasing;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-merge", "interactive")))
+                    return RepositoryState.RebasingInteractive;
+
+                if (Directory.Exists(Path.Combine(this.WorkingDirectory, "rebase-merge")))
+                    return RepositoryState.RebasingMerge;
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, "MERGE_HEAD")))
+                {
+                    if(this.Index.HasUnmergedPaths)
+                        return RepositoryState.Merging;
+
+                    return RepositoryState.MergingResolved;
+                }
+
+                if (File.Exists(Path.Combine(this.WorkingDirectory, "BISECT_LOG")))
+                    return RepositoryState.Bisecting;
+
+                return RepositoryState.Safe;
+            }
+        }
 
         public object OpenObject(string id)
         {

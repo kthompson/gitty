@@ -46,6 +46,11 @@ namespace Gitty
             }
         }
 
+        public bool HasUnmergedPaths
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         private bool _loaded;
         private void EnsureLoaded()
         {
