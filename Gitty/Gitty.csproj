@@ -112,6 +112,9 @@
     <EmbeddedResource Include="Content\hooks\update.sample" />
     <EmbeddedResource Include="Content\info\exclude" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content\config_bare" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

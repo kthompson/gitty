@@ -21,9 +21,14 @@ namespace Gitty
 
             if (gitDirectory == null)
                 throw new ArgumentNullException("gitDirectory",
-                                                "You must specify at least workingDirectory or gitDirectory");
+                                                "You must specify a workingDirectory or gitDirectory");
+
+            if (create && !Directory.Exists(gitDirectory))
+                Directory.CreateDirectory(gitDirectory);
 
             this.Location = Helper.MakeAbsolutePath(gitDirectory);
+
+            this.InfoLocation = Path.Combine(this.Location, "info");
 
             this.HooksLocation = Path.Combine(this.Location, "hooks");
 
@@ -40,16 +45,31 @@ namespace Gitty
                 return;
 
             //.git
-            Directory.CreateDirectory(this.Location);
-            EmbeddedToFile("Gitty.Content.config", Path.Combine(this.Location, "config"));
+            var configfile = this.WorkingDirectory == null
+                                 ? "Gitty.Content.config_bare"
+                                 : "Gitty.Content.config";
+
+            EmbeddedToFile(configfile, Path.Combine(this.Location, "config"));
             EmbeddedToFile("Gitty.Content.description", Path.Combine(this.Location, "description"));
             EmbeddedToFile("Gitty.Content.HEAD", Path.Combine(this.Location, "HEAD"));
+            
             //.git/hooks/
-            Directory.CreateDirectory(Path.Combine(this.Location, "hooks"));
+            Directory.CreateDirectory(this.HooksLocation);
+            EmbeddedHookToFile("applypatch-msg.sample");
+            EmbeddedHookToFile("commit-msg.sample");
+            EmbeddedHookToFile("post-commit.sample");
+            EmbeddedHookToFile("post-receive.sample");
+            EmbeddedHookToFile("post-update.sample");
+            EmbeddedHookToFile("pre-applypatch.sample");
+            EmbeddedHookToFile("pre-commit.sample");
+            EmbeddedHookToFile("pre-rebase.sample");
+            EmbeddedHookToFile("prepare-commit-msg.sample");
+            EmbeddedHookToFile("update.sample");
+
             //.git/info/
-            var info = Path.Combine(this.Location, "info");
-            Directory.CreateDirectory(info);
-            EmbeddedToFile("Gitty.Content.info.exclude", Path.Combine(info, "exclude"));
+            Directory.CreateDirectory(this.InfoLocation);
+            EmbeddedToFile("Gitty.Content.info.exclude", Path.Combine(this.InfoLocation, "exclude"));
+
             //.git/objects
             Directory.CreateDirectory(this.ObjectsLocation);
             //.git/objects/info
@@ -62,19 +82,6 @@ namespace Gitty
             Directory.CreateDirectory(this.HeadsLocation);
             //.git/refs/tags
             Directory.CreateDirectory(this.TagsLocation);
-            //.git/hooks/
-            Directory.CreateDirectory(this.HooksLocation);
-
-            EmbeddedHookToFile("applypatch-msg.sample");
-            EmbeddedHookToFile("commit-msg.sample");
-            EmbeddedHookToFile("post-commit.sample");
-            EmbeddedHookToFile("post-receive.sample");
-            EmbeddedHookToFile("post-update.sample");
-            EmbeddedHookToFile("pre-applypatch.sample");
-            EmbeddedHookToFile("pre-commit.sample");
-            EmbeddedHookToFile("pre-rebase.sample");
-            EmbeddedHookToFile("prepare-commit-msg.sample");
-            EmbeddedHookToFile("update.sample");
         }
 
         private void EmbeddedHookToFile(string file)
@@ -139,6 +146,7 @@ namespace Gitty
         public string PacksLocation { get; private set; }
         public string ObjectsLocation { get; private set; }
         public string HooksLocation { get; private set; }
+        public string InfoLocation { get; private set; }
 
         public Head Head
         {
