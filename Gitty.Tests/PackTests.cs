@@ -8,9 +8,9 @@ using NUnit.Framework;
 namespace Gitty.Tests
 {
     [TestFixture]
-    public class PackTests : TestBase
+    public class PackTests
     {
-        public static readonly string PacksPath = Path.Combine(ArtifactsPath, "packs");
+        public static readonly string PacksPath = Path.Combine(TestHelper.ArtifactsPath, "packs");
 
         public readonly string[] PackObjectIds = new[]
                                                      {
