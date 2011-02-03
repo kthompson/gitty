@@ -25,6 +25,8 @@ namespace Gitty
 
             this.Location = Helper.MakeAbsolutePath(gitDirectory);
 
+            this.HooksLocation = Path.Combine(this.Location, "hooks");
+
             this.ObjectsLocation = Path.Combine(this.Location, "objects");
             this.PacksLocation = Path.Combine(this.ObjectsLocation, "pack");
 
@@ -61,17 +63,23 @@ namespace Gitty
             //.git/refs/tags
             Directory.CreateDirectory(this.TagsLocation);
             //.git/hooks/
-            var hooks = Path.Combine(this.Location, "hooks");
-            EmbeddedToFile("Gitty.Content.hooks.applypatch-msg.sample", Path.Combine(hooks, "applypatch-msg.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.commit-msg.sample", Path.Combine(hooks, "commit-msg.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.post-commit.sample", Path.Combine(hooks, "post-commit.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.post-receive.sample", Path.Combine(hooks, "post-receive.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.post-update.sample", Path.Combine(hooks, "post-update.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.pre-applypatch.sample", Path.Combine(hooks, "pre-applypatch.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.pre-commit.sample", Path.Combine(hooks, "pre-commit.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.pre-rebase.sample", Path.Combine(hooks, "pre-rebase.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.prepare-commit-msg.sample", Path.Combine(hooks, "prepare-commit-msg.sample"));
-            EmbeddedToFile("Gitty.Content.hooks.update.sample", Path.Combine(hooks, "update.sample"));
+            Directory.CreateDirectory(this.HooksLocation);
+
+            EmbeddedHookToFile("applypatch-msg.sample");
+            EmbeddedHookToFile("commit-msg.sample");
+            EmbeddedHookToFile("post-commit.sample");
+            EmbeddedHookToFile("post-receive.sample");
+            EmbeddedHookToFile("post-update.sample");
+            EmbeddedHookToFile("pre-applypatch.sample");
+            EmbeddedHookToFile("pre-commit.sample");
+            EmbeddedHookToFile("pre-rebase.sample");
+            EmbeddedHookToFile("prepare-commit-msg.sample");
+            EmbeddedHookToFile("update.sample");
+        }
+
+        private void EmbeddedHookToFile(string file)
+        {
+            EmbeddedToFile("Gitty.Content.hooks." + file, Path.Combine(this.HooksLocation, file));
         }
 
         private static void EmbeddedToFile(string resource, string file)
@@ -130,6 +138,7 @@ namespace Gitty
         public string TagsLocation { get; private set; }
         public string PacksLocation { get; private set; }
         public string ObjectsLocation { get; private set; }
+        public string HooksLocation { get; private set; }
 
         public Head Head
         {
