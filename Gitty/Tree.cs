@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Gitty
 {
@@ -24,6 +27,34 @@ namespace Gitty
                 this.EnsureLoaded();
                 return _items.AsReadOnly();
             }
+        }
+
+        private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T,bool> filter, Func<T, IEnumerable<T>> selector)
+        {
+            foreach (var entry in entries)
+            {
+                if (filter(entry))
+                {
+                    yield return entry;
+                }
+                else
+                {
+                    foreach (var subentry in FlattenTree(selector(entry), filter, selector))
+                    {
+                        yield return subentry;
+                    }
+                }
+            }
+
+        }
+
+        public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
+        {
+            if (!recursive)
+                return this.Items;
+
+            return FlattenTree(this.Items, entry => entry.Type == "blob",
+                               entry => ((Tree) entry.Entry).EnumerateItems(recursive));
         }
 
         private bool _loaded;
