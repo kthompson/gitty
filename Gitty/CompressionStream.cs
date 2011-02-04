@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Gitty
 {
-    public class CompressionStream : DeflateStream
+    internal class CompressionStream : DeflateStream
     {
         private static Stream MoveStream(Stream stream)
         {
