@@ -122,5 +122,26 @@ namespace Gitty.Tests
                 return false;
             }
         }
+
+        public static IDisposable WorkingTree(string workingTree)
+        {
+            Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingTree, EnvironmentVariableTarget.Process);
+            return new Temp(() => Environment.SetEnvironmentVariable("GIT_WORK_TREE", string.Empty, EnvironmentVariableTarget.Process));
+        }
+
+        class Temp : IDisposable
+        {
+            private readonly Action _disposeAction;
+
+            public Temp(Action disposeAction)
+            {
+                _disposeAction = disposeAction;
+            }
+
+            public void Dispose()
+            {
+                _disposeAction();
+            }
+        }
     }
 }
