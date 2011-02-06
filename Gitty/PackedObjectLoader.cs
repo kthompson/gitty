@@ -26,7 +26,7 @@ namespace Gitty
                 if (contentLoader != null)
                 {
                     using (
-                        var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Compress, true))
+                        var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Decompress, true))
                     {
                         contentLoader(stream, info);
                     }
