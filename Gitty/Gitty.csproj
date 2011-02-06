@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryDelta.cs" />
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
     <Compile Include="Extensions.cs" />

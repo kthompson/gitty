@@ -227,8 +227,20 @@ namespace Gitty
                 case "tag":
                     return new Tag(this, loader);
                 default:
+                    return LoadDelta(this, loader);
                     throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", info.Type, id));
             }
+        }
+
+        private object LoadDelta(Repository repository, ObjectLoader loader)
+        {
+            loader.Load((stream, info) =>
+                            {
+                                var offset = stream.Read7BitEncodedInt();
+
+                            });
+
+            return null;
         }
     }
 }

@@ -6,30 +6,43 @@ namespace Gitty
     class PackedObjectLoader : ObjectLoader
     {
         public PackFile PackFile { get; private set; }
+        public int? Offset { get; private set; }
 
-        public PackedObjectLoader(PackFile packFile, string id)
+        public PackedObjectLoader(PackFile packFile, string id, int? offset = null)
             : base(id)
         {
             this.PackFile = packFile;
+            this.Offset = offset;
         }
 
         public override ObjectLoadInfo Load(ContentLoader contentLoader = null)
         {
-            var entry = this.PackFile.Index.GetEntry(this.Id);
+            if (this.Offset == null)
+            {
+                var entry = this.PackFile.Index.GetEntry(this.Id);
+                this.Offset = entry.Offset;
+            }
 
+            return LoadFromOffset(offset, contentLoader);
+        }
+
+        private ObjectLoadInfo LoadFromOffset(int offset, ContentLoader contentLoader)
+        {
             using (var file = File.OpenRead(this.PackFile.Location))
             {
-                file.Seek(entry.Offset, SeekOrigin.Begin);
+                file.Seek(offset, SeekOrigin.Begin);
                 
                 var info = GetObjectInfo(file);
 
                 if (contentLoader != null)
                 {
-                    using (
-                        var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Decompress, true))
-                    {
-                        contentLoader(stream, info);
-                    }
+                    //using (
+                    //    var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Decompress,
+                    //                                       true))
+                    //{
+                    contentLoader(file, info);
+                    //}
+                    
                 }
 
                 return info;
@@ -41,27 +54,11 @@ namespace Gitty
             var b = file.ReadByte();
             var type = (b & 0x70) >> 4;
 
-            var size = GetSize(file, b);
+            var size = file.Read7BitEncodedInt(b & 0xF, 4);
 
             var typeString = GetTypeString(type);
 
             return new ObjectLoadInfo(typeString, size);
-        }
-
-        private static int GetSize(Stream file, int b)
-        {
-            var size = (b & 0xF);
-            var sizeBits = 4;
-            while (true)
-            {
-                if ((b & 0x80) != 0x80)
-                    break;
-
-                b = file.ReadByte();
-                size |= (b & 0x7F) << sizeBits;
-                sizeBits += 7;
-            }
-            return size;
         }
 
         private static string GetTypeString(int type)
