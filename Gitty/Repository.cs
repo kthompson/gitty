@@ -226,8 +226,9 @@ namespace Gitty
                     return new Blob(loader);
                 case "tag":
                     return new Tag(this, loader);
+                default:
+                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", info.Type, id));
             }
-            return null;
         }
     }
 }
