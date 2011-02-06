@@ -9,6 +9,23 @@ namespace Gitty
 {
     public static class Extensions
     {
+        public static int Read7BitEncodedInt(this Stream file, int start = 0, int bitCount = 0)
+        {
+            var size = start;
+            
+            while (true)
+            {
+                if ((start & 0x80) != 0x80)
+                    break;
+
+                start = file.ReadByte();
+                size |= (start & 0x7F) << bitCount;
+                bitCount += 7;
+            }
+
+            return size;
+        }
+
         public static TResult Try<T, TResult>(this T obj, Func<T, TResult> tryMethod)
             where T : class
             where TResult : class
