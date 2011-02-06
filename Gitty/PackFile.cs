@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace Gitty
 {
@@ -53,7 +54,7 @@ namespace Gitty
         {
             if (_loaded)
                 return;
-
+            
             using (var reader = new BinaryReader(File.OpenRead(this.Location)))
             {
                 var sig = reader.ReadBytes(4);
@@ -66,9 +67,9 @@ namespace Gitty
                     throw new InvalidOperationException("not a pack file");
                 }
 
-                this._version = reader.ReadInt32();
-                this._entryCount = reader.ReadInt32();
-                this._index = new PackIndex(this.IndexLocation, this.EntryCount);
+                this._version = reader.ReadBigEndianInt32();
+                this._entryCount = reader.ReadBigEndianInt32();
+                this._index = new PackIndex(this.IndexLocation, this._entryCount);
             }
             this._loaded = true;
         }
