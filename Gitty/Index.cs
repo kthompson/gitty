@@ -69,8 +69,8 @@ namespace Gitty
                     throw new InvalidOperationException("not a index file");
                 }
 
-                this._version = reader.ReadBigInt32();
-                this._entryCount = reader.ReadBigInt32();
+                this._version = reader.ReadBigEndianInt32();
+                this._entryCount = reader.ReadBigEndianInt32();
                 var count = this._entryCount;
                 while (count-- > 0)
                     this._entries.Add(new IndexEntry(reader));

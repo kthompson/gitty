@@ -35,7 +35,7 @@ namespace Gitty
             {
                 //seek to fanout index
                 reader.BaseStream.Seek(_fanoutStartOffset + fanoutIndex * 4, SeekOrigin.Begin);
-                var index = IPAddress.NetworkToHostOrder(reader.ReadInt32());
+                var index = reader.ReadBigEndianInt32();
 
                 reader.BaseStream.Seek(_sha1StartOffset + index*20, SeekOrigin.Begin);
                 // TODO do a binary search to find the Id
@@ -57,10 +57,10 @@ namespace Gitty
                 }
 
                 reader.BaseStream.Seek(_crcStartOffset + index * 4, SeekOrigin.Begin);
-                var crc = IPAddress.NetworkToHostOrder(reader.ReadInt32());
+                var crc = reader.ReadBigEndianInt32();
 
                 reader.BaseStream.Seek(_offsetStartOffset + index * 4, SeekOrigin.Begin);
-                var offset = IPAddress.NetworkToHostOrder(reader.ReadInt32());
+                var offset = reader.ReadBigEndianInt32();
 
                 return new PackIndexEntry(id, crc, offset);
             }

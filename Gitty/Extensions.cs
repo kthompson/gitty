@@ -9,14 +9,19 @@ namespace Gitty
 {
     public static class Extensions
     {
+        public static TResult Try<T, TResult>(this T obj, Func<T, TResult> tryMethod)
+            where T : class
+            where TResult : class
+        {
+            return obj == null ? null : tryMethod(obj);
+        }
 
-
-        public static int ReadBigInt32(this BinaryReader reader)
+        public static int ReadBigEndianInt32(this BinaryReader reader)
         {
             return IPAddress.HostToNetworkOrder(reader.ReadInt32());
         }
 
-        public static short ReadBigInt16(this BinaryReader reader)
+        public static short ReadBigEndianInt16(this BinaryReader reader)
         {
             return IPAddress.HostToNetworkOrder(reader.ReadInt16());
         }
