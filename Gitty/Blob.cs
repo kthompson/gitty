@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.AccessControl;
 
 namespace Gitty
 {
-    public class Blob 
+    public class Blob : ITreeEntry
     {
         private readonly ObjectLoader _loader;
 
@@ -19,6 +20,18 @@ namespace Gitty
         public void GetContentStream(ObjectLoader.ContentLoader contentLoader)
         {
             this._loader.Load(contentLoader);
+        }
+
+        public ITreeEntry Parent { get; set; }
+
+        public string Name
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string FullName
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

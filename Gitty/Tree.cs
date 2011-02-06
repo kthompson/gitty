@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Gitty
 {
-    public class Tree 
+    public class Tree : ITreeEntry
     {
         private readonly Repository _repository;
         private readonly ObjectLoader _loader;
@@ -58,6 +58,19 @@ namespace Gitty
         }
 
         private bool _loaded;
+
+        public ITreeEntry Parent { get; set; }
+
+        public string Name
+        {
+            get { return this.Parent.Try(o => o.Name); }
+        }
+
+        public string FullName
+        {
+            get { return this.Parent.Try(o => o.FullName); }
+        }
+
         private void EnsureLoaded()
         {
             if (_loaded)
@@ -76,7 +89,8 @@ namespace Gitty
                     bytesRead += name.Length + 1;
                     var id = stream.ReadId();
                     bytesRead += 20;
-                    this._items.Add(new TreeEntry(this._repository, id, name, mode));
+                    var entry = new TreeEntry(this._repository, id, name, mode) {Parent = this};
+                    this._items.Add(entry);
                 }
             });
 
