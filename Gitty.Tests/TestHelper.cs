@@ -15,6 +15,8 @@ namespace Gitty.Tests
         public static readonly string SampleRepo = Path.Combine(ArtifactsPath, "sample_repo");
         public static readonly string SampleRepoGit = Path.Combine(ArtifactsPath, "sample_repo.git");
 
+        public static readonly string WorkingDirectory = new DirectoryInfo(Path.Combine("..", "..", "..")).FullName;
+
         public static string GetObjectAsString(string type, string id)
         {
             if (!type.EndsWith("s"))
@@ -123,9 +125,9 @@ namespace Gitty.Tests
             }
         }
 
-        public static IDisposable WorkingTree(string workingTree)
+        public static IDisposable WorkingTree(string workingTree = null)
         {
-            Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingTree, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingTree ?? WorkingDirectory, EnvironmentVariableTarget.Process);
             return new Temp(() => Environment.SetEnvironmentVariable("GIT_WORK_TREE", string.Empty, EnvironmentVariableTarget.Process));
         }
 

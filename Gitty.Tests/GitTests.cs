@@ -64,9 +64,7 @@ namespace Gitty.Tests
         [Test]
         public void EnumerateTreeItems()
         {
-            var workingDirectory = new DirectoryInfo(Path.Combine("..", "..", "..")).FullName;
-
-            using (TestHelper.WorkingTree(workingDirectory))
+            using (TestHelper.WorkingTree())
             {
                 //Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingDirectory);
                 //Environment.SetEnvironmentVariable("GIT_DIR", Path.Combine(workingDirectory, ".git"));
@@ -75,7 +73,7 @@ namespace Gitty.Tests
 
                 var result = TestHelper.Git.LsTree("--name-only", treeId);
 
-                var git = Git.Open(workingDirectory);
+                var git = Git.Open(TestHelper.WorkingDirectory);
                 Assert.NotNull(git);
 
                 var o = git.OpenObject(treeId);
@@ -100,18 +98,13 @@ namespace Gitty.Tests
         [Test]
         public void EnumerateTreeItemsRecursive()
         {
-            var workingDirectory = new DirectoryInfo(Path.Combine("..", "..", "..")).FullName;
-
-            using (TestHelper.WorkingTree(workingDirectory))
-            {
-                //Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingDirectory);
-                //Environment.SetEnvironmentVariable("GIT_DIR", Path.Combine(workingDirectory, ".git"));
-
+           using (TestHelper.WorkingTree())
+           {
                 var treeId = "49055ddb2bad8335a11de37721de51419c455e2f";
 
                 var result = TestHelper.Git.LsTree("-r", "--name-only", treeId);
 
-                var git = Git.Open(workingDirectory);
+                var git = Git.Open(TestHelper.WorkingDirectory);
                 Assert.NotNull(git);
 
                 var o = git.OpenObject(treeId);
@@ -128,7 +121,8 @@ namespace Gitty.Tests
                     {
                         var line = reader.ReadLine();
                         var name = entry.Name;
-                        Assert.AreEqual(line, name);
+                        var fullName = entry.FullName;
+                        Assert.AreEqual(line, fullName);
                     }
                 }
             }

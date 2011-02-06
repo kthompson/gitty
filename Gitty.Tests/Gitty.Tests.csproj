@@ -79,6 +79,7 @@
     <Compile Include="GitTests.cs" />
     <Compile Include="IndexTests.cs" />
     <Compile Include="MSysGit.cs" />
+    <Compile Include="ObjectTests.cs" />
     <Compile Include="PackTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="SampleRepoTests.cs" />
