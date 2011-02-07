@@ -28,6 +28,23 @@ namespace Gitty
             return null;
         }
 
+        public static ContentLoader CompressedContentLoader(ContentLoader loader)
+        {
+            if (loader == null)
+                return (stream, objectLoader) => { };
+
+            return (stream, objectLoader) =>
+                       {
+                           using (
+                               var compressed = new CompressionStream(stream,
+                                                                      CompressionMode.Decompress,
+                                                                      true))
+                           {
+                               loader(compressed, objectLoader);
+                           }
+                       };
+        }
+
         public static ContentLoader DefaultContentLoader(Stream stream)
         {
             return (read, loadInfo) =>

@@ -18,14 +18,9 @@ namespace Gitty
 
         public override void Load(ContentLoader contentLoader = null)
         {
-            LoadFromOffset(this.Offset, contentLoader);
-        }
-
-        private void LoadFromOffset(long offset, ContentLoader contentLoader)
-        {
             using (var file = File.OpenRead(this.PackFile.Location))
             {
-                file.Seek(offset, SeekOrigin.Begin);
+                file.Seek(this.Offset, SeekOrigin.Begin);
                 
                 LoadHeaderInfo(file);
                 var position = file.Position;
@@ -33,29 +28,25 @@ namespace Gitty
                 if(this.Type == "ofs_delta")
                 {
                     LoadDelta(file, contentLoader);
+                    return;
                 }
-                
-                if (contentLoader != null)
-                {
-                    //using (
-                    //    var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Decompress,
-                    //                                       true))
-                    //{
-                    contentLoader(file, this);
-                    //}
-                    
-                }
+
+                CompressedContentLoader(contentLoader)(file, this);
             }
         }
 
         private void LoadDelta(FileStream file, ContentLoader contentLoader)
         {
-            var offset = file.Read7BitEncodedInt();
+            var offset = this.Offset - file.Read7BitEncodedInt();
+            var dataOffset = file.Position;
+
             var baseObject = this.PackFile.GetObjectLoader(offset);
             baseObject.Load((stream, loadInfo) =>
                                         {
                                             this.Type = loadInfo.Type;
-                                            this.Size = loadInfo.Size;
+                                            //this.Size = loadInfo.Size;
+                                            if(contentLoader != null)
+                                                contentLoader(stream, loadInfo);
                                         });
         }
 
@@ -64,7 +55,17 @@ namespace Gitty
             var b = file.ReadByte();
             var type = (b & 0x70) >> 4;
 
-            this.Size = file.Read7BitEncodedInt(b & 0xF, 4);
+            var size = b & 0xF;
+            var bits = 4;
+
+            while((b & 0x80) == 0x80)
+            {
+                b = file.ReadByte();
+                size += (b & 0x7f) << bits;
+                bits += 7;
+            }
+
+            this.Size = size;
             this.Type = GetTypeString(type);
         }
 
