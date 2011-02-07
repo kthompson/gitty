@@ -82,11 +82,21 @@ namespace Gitty.Tests
         public static void AssertFilesSame(string file1, string file2)
         {
             // open first file 
-            using (var f1 = new FileStream(file1, FileMode.Open))
+            var stream1 = new FileStream(file1, FileMode.Open);
+            var stream2 = new FileStream(file2, FileMode.Open);
+
+            Assert.AreEqual(stream1.Length, stream2.Length);
+            
+            AssertFilesSame(stream1, stream2);
+        }
+
+        public static void AssertFilesSame(Stream stream1, Stream stream2)
+        {
+            using (var f1 = stream1)
             {
-                using (var f2 = new FileStream(file2, FileMode.Open))
+                using (var f2 = stream2)
                 {
-                    Assert.AreEqual(f1.Length, f2.Length, string.Format("File1: {0}\nFile2: {1}", file1, file2));
+                    
 
                     while (true)
                     {

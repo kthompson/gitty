@@ -215,32 +215,21 @@ namespace Gitty
             if (loader == null)
                 return null;
 
-            var info = loader.Load();
-            switch (info.Type)
+            loader.Load();
+            switch (loader.Type)
             {
                 case "commit":
-                    return new Commit(this, loader);
+                    return new Commit(this, loader, id);
                 case "tree":
-                    return new Tree(this, loader);
+                    return new Tree(this, loader, id);
                 case "blob":
-                    return new Blob(loader);
+                    return new Blob(loader, id);
                 case "tag":
-                    return new Tag(this, loader);
+                    return new Tag(this, loader, id);
+                case "ofs_delta":
                 default:
-                    return LoadDelta(this, loader);
-                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", info.Type, id));
+                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
             }
-        }
-
-        private object LoadDelta(Repository repository, ObjectLoader loader)
-        {
-            loader.Load((stream, info) =>
-                            {
-                                var offset = stream.Read7BitEncodedInt();
-
-                            });
-
-            return null;
         }
     }
 }

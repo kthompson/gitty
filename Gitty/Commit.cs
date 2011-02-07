@@ -61,12 +61,12 @@ namespace Gitty
 
         public string Id { get; private set; }
 
-        internal Commit(Repository repository, ObjectLoader loader)
+        internal Commit(Repository repository, ObjectLoader loader, string id)
         {
             _repository = repository;
             _loader = loader;
 
-            this.Id = loader.Id;
+            this.Id = id;
             this._parents = new List<Commit>();
         }
 

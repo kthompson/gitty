@@ -5,37 +5,22 @@ using System.Text;
 
 namespace Gitty
 {
-    public class ObjectLoadInfo
-    {
-        public string Type { get; private set; }
-        public int Size { get; private set; }
-
-        internal ObjectLoadInfo(string type, int size)
-        {
-            this.Type = type;
-            this.Size = size;
-        }
-    }
-
     public abstract class ObjectLoader
     {
-        public string Id { get; private set; }
+        public string Type { get; protected set; }
+        public long Size { get; protected  set; }
 
-        protected ObjectLoader(string id)
-        {
-            this.Id = id;
-        }
+        public delegate void ContentLoader(Stream stream, ObjectLoader loader);
 
-        public delegate void ContentLoader(Stream stream, ObjectLoadInfo loadInfo);
-
-        public abstract ObjectLoadInfo Load(ContentLoader contentLoader = null);
+        public abstract void Load(ContentLoader contentLoader = null);
 
         public static ObjectLoader Create(Repository repository, string id)
         {
-            var loader = new LooseObjectLoader(repository.ObjectsLocation, id);
-            if (File.Exists(loader.Location))
+            var loader = LooseObjectLoader.GetObjectLoader(repository.ObjectsLocation, id);
+            if (loader != null)
                 return loader;
 
+            //TODO: we should be caching the pack files and using FileSystemWatcher or something for updates
             var pf = PackFile.FindAll(repository).Where(pack => pack.HasEntry(id)).FirstOrDefault();
             if (pf != null)
                 return pf.GetObjectLoader(id);

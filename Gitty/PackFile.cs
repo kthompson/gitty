@@ -92,7 +92,13 @@ namespace Gitty
 
         public ObjectLoader GetObjectLoader(string id)
         {
-            return new PackedObjectLoader(this, id);
+            var info = this.Index.GetEntry(id);
+            return GetObjectLoader(info.Offset);
+        }
+
+        public ObjectLoader GetObjectLoader(long offset)
+        {
+            return new PackedObjectLoader(this, offset);
         }
     }
 }

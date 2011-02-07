@@ -6,59 +6,66 @@ namespace Gitty
     class PackedObjectLoader : ObjectLoader
     {
         public PackFile PackFile { get; private set; }
-        public int? Offset { get; private set; }
+        public long Offset { get; private set; }
 
-        public PackedObjectLoader(PackFile packFile, string id, int? offset = null)
-            : base(id)
+        private ObjectLoader _base;
+
+        public PackedObjectLoader(PackFile packFile, long offset)
         {
             this.PackFile = packFile;
             this.Offset = offset;
         }
 
-        public override ObjectLoadInfo Load(ContentLoader contentLoader = null)
+        public override void Load(ContentLoader contentLoader = null)
         {
-            if (this.Offset == null)
-            {
-                var entry = this.PackFile.Index.GetEntry(this.Id);
-                this.Offset = entry.Offset;
-            }
-
-            return LoadFromOffset(offset, contentLoader);
+            LoadFromOffset(this.Offset, contentLoader);
         }
 
-        private ObjectLoadInfo LoadFromOffset(int offset, ContentLoader contentLoader)
+        private void LoadFromOffset(long offset, ContentLoader contentLoader)
         {
             using (var file = File.OpenRead(this.PackFile.Location))
             {
                 file.Seek(offset, SeekOrigin.Begin);
                 
-                var info = GetObjectInfo(file);
+                LoadHeaderInfo(file);
+                var position = file.Position;
 
+                if(this.Type == "ofs_delta")
+                {
+                    LoadDelta(file, contentLoader);
+                }
+                
                 if (contentLoader != null)
                 {
                     //using (
                     //    var stream = new CompressionStream(file, System.IO.Compression.CompressionMode.Decompress,
                     //                                       true))
                     //{
-                    contentLoader(file, info);
+                    contentLoader(file, this);
                     //}
                     
                 }
-
-                return info;
             }
         }
 
-        private static ObjectLoadInfo GetObjectInfo(Stream file)
+        private void LoadDelta(FileStream file, ContentLoader contentLoader)
+        {
+            var offset = file.Read7BitEncodedInt();
+            var baseObject = this.PackFile.GetObjectLoader(offset);
+            baseObject.Load((stream, loadInfo) =>
+                                        {
+                                            this.Type = loadInfo.Type;
+                                            this.Size = loadInfo.Size;
+                                        });
+        }
+
+        private void LoadHeaderInfo(Stream file)
         {
             var b = file.ReadByte();
             var type = (b & 0x70) >> 4;
 
-            var size = file.Read7BitEncodedInt(b & 0xF, 4);
-
-            var typeString = GetTypeString(type);
-
-            return new ObjectLoadInfo(typeString, size);
+            this.Size = file.Read7BitEncodedInt(b & 0xF, 4);
+            this.Type = GetTypeString(type);
         }
 
         private static string GetTypeString(int type)

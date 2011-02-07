@@ -9,13 +9,12 @@ namespace Gitty
     {
         public string Location { get; private set; }
 
-        internal LooseObjectLoader(string objectsPath, string id)
-            : base(id)
+        private LooseObjectLoader(string location)
         {
-            this.Location = Path.Combine(objectsPath, id.Substring(0, 2), id.Substring(2));
+            this.Location = location;
         }
 
-        public override ObjectLoadInfo Load(ContentLoader contentLoader = null)
+        public override void Load(ContentLoader contentLoader = null)
         {
             var size = 0;
             var type = string.Empty;
@@ -43,11 +42,23 @@ namespace Gitty
                     }
                     sb.Append(c);
                 }
-                var loadInfo = new ObjectLoadInfo(type, size);
+                this.Type = type;
+                this.Size = size;
+
                 if (contentLoader != null)
-                    contentLoader(stream, loadInfo);
-                return loadInfo;
+                    contentLoader(stream, this);
+
             }
+        }
+
+        public static LooseObjectLoader GetObjectLoader(string objectsLocation, string id)
+        {
+            var location = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
+
+            if (File.Exists(location))
+                return new LooseObjectLoader(location);
+
+            return null;
         }
     }
 }

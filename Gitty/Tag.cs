@@ -8,11 +8,11 @@ namespace Gitty
         private readonly Repository _repository;
         private readonly ObjectLoader _loader;
 
-        internal Tag(Repository repository, ObjectLoader loader)
+        internal Tag(Repository repository, ObjectLoader loader, string id)
         {
             _repository = repository;
             _loader = loader;
-            this.Id = loader.Id;
+            this.Id = id;
         }
 
         public string Id { get; private set; }

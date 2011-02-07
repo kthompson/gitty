@@ -129,7 +129,7 @@ namespace Gitty.Tests
             var loader = ObjectLoader.Create(git, head.Id);
             Assert.NotNull(loader);
 
-            var info = loader.Load((stream, loadInfo) =>
+            loader.Load((stream, loadInfo) =>
             {
                 Assert.AreEqual(189, loadInfo.Size);
                 Assert.AreEqual("commit", loadInfo.Type);
@@ -145,8 +145,8 @@ namespace Gitty.Tests
                 Assert.AreEqual(expected, actual);
             });
 
-            Assert.AreEqual(189, info.Size);
-            Assert.AreEqual("commit", info.Type);
+            Assert.AreEqual(189, loader.Size);
+            Assert.AreEqual("commit", loader.Type);
 
         }
 

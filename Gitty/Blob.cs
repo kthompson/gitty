@@ -10,9 +10,9 @@ namespace Gitty
 
         public string Id { get; private set; }
 
-        internal Blob(ObjectLoader loader)
+        internal Blob(ObjectLoader loader, string id)
         {
-            this.Id = loader.Id;
+            this.Id = id;
 
             this._loader = loader;
         }
