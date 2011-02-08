@@ -76,6 +76,7 @@
     <Compile Include="BinaryDelta.cs" />
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
+    <Compile Include="DeltaPackedObjectLoader.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Git.cs" />
     <Compile Include="Blob.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="IndexEntry.cs" />
     <Compile Include="LooseObjectLoader.cs" />
     <Compile Include="ObjectLoader.cs" />
+    <Compile Include="ObjectType.cs" />
     <Compile Include="PackedObjectLoader.cs" />
     <Compile Include="PackFile.cs" />
     <Compile Include="PackIndex.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Tag.cs" />
     <Compile Include="Tree.cs" />
     <Compile Include="TreeEntry.cs" />
+    <Compile Include="WholePackedObjectLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Content\config" />

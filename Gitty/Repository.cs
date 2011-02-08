@@ -215,18 +215,18 @@ namespace Gitty
             if (loader == null)
                 return null;
 
-            loader.Load();
             switch (loader.Type)
             {
-                case "commit":
+                case ObjectType.Commit:
                     return new Commit(this, loader, id);
-                case "tree":
+                case ObjectType.Tree:
                     return new Tree(this, loader, id);
-                case "blob":
+                case ObjectType.Blob:
                     return new Blob(loader, id);
-                case "tag":
+                case ObjectType.Tag:
                     return new Tag(this, loader, id);
-                case "ofs_delta":
+                case ObjectType.OffsetDelta:
+                case ObjectType.ReferenceDelta:
                 default:
                     throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
             }

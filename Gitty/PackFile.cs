@@ -90,15 +90,15 @@ namespace Gitty
             return this.Index.GetEntry(id) != null;
         }
 
-        public ObjectLoader GetObjectLoader(string id)
+        public PackedObjectLoader GetObjectLoader(string id)
         {
             var info = this.Index.GetEntry(id);
             return GetObjectLoader(info.Offset);
         }
 
-        public ObjectLoader GetObjectLoader(long offset)
+        public PackedObjectLoader GetObjectLoader(long offset)
         {
-            return new PackedObjectLoader(this, offset);
+            return PackedObjectLoader.Create(this, offset);
         }
     }
 }

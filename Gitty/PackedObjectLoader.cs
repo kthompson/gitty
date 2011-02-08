@@ -3,41 +3,74 @@ using System.IO;
 
 namespace Gitty
 {
-    class PackedObjectLoader : ObjectLoader
+    abstract class PackedObjectLoader : ObjectLoader
     {
         public PackFile PackFile { get; private set; }
-        public long Offset { get; private set; }
+
+        public long ObjectOffset { get; private set; }
+        public long DataOffset { get; private set; }
 
         private ObjectLoader _base;
 
-        public PackedObjectLoader(PackFile packFile, long offset)
+        protected PackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, ObjectType type)
         {
             this.PackFile = packFile;
-            this.Offset = offset;
+            this.Type = type;
+            this.ObjectOffset = objectOffset;
+            this.DataOffset = dataOffset;
+            this.Size = size;
         }
 
-        public override void Load(ContentLoader contentLoader = null)
+        public static PackedObjectLoader Create(PackFile packFile, long objectOffset)
         {
-            using (var file = File.OpenRead(this.PackFile.Location))
+            using (var file = File.OpenRead(packFile.Location))
             {
-                file.Seek(this.Offset, SeekOrigin.Begin);
-                
-                LoadHeaderInfo(file);
-                var position = file.Position;
+                file.Seek(objectOffset, SeekOrigin.Begin);
 
-                if(this.Type == "ofs_delta")
+                var b = file.ReadByte();
+                var typeCode = (b & 0x70) >> 4;
+                var type = (ObjectType) typeCode;
+
+                var size = b & 0xF;
+                var bits = 4;
+
+                while((b & 0x80) == 0x80)
                 {
-                    LoadDelta(file, contentLoader);
-                    return;
+                    b = file.ReadByte();
+                    size += (b & 0x7f) << bits;
+                    bits += 7;
                 }
 
-                CompressedContentLoader(contentLoader)(file, this);
+                switch(type)
+                {
+                    case ObjectType.Blob:
+                    case ObjectType.Commit:
+                    case ObjectType.Tag:
+                    case ObjectType.Tree:
+                        return new WholePackedObjectLoader(packFile, objectOffset, file.Position, size, type);
+
+                    case ObjectType.OffsetDelta:
+                        var baseOffset = objectOffset - file.Read7BitEncodedInt();
+                        return new DeltaOffsetPackedObjectLoader(packFile, objectOffset, file.Position, size, type, baseOffset);
+
+                    case ObjectType.ReferenceDelta:
+                        var baseId = file.ReadId();
+                        return new DeltaReferencePackedObjectLoader(packFile, objectOffset, file.Position, size, type, baseId);
+
+                    case ObjectType.Undefined:
+                        throw new InvalidDataException("ObjectType was undefined.");
+                    case ObjectType.Reserved:
+                        throw new InvalidDataException("ObjectType is reserved.");
+                    default:
+                        throw new InvalidDataException("ObjectType is not valid.");
+                }
+                
             }
         }
 
         private void LoadDelta(FileStream file, ContentLoader contentLoader)
         {
-            var offset = this.Offset - file.Read7BitEncodedInt();
+            var offset = this.ObjectOffset - file.Read7BitEncodedInt();
             var dataOffset = file.Position;
 
             var baseObject = this.PackFile.GetObjectLoader(offset);
@@ -48,46 +81,6 @@ namespace Gitty
                                             if(contentLoader != null)
                                                 contentLoader(stream, loadInfo);
                                         });
-        }
-
-        private void LoadHeaderInfo(Stream file)
-        {
-            var b = file.ReadByte();
-            var type = (b & 0x70) >> 4;
-
-            var size = b & 0xF;
-            var bits = 4;
-
-            while((b & 0x80) == 0x80)
-            {
-                b = file.ReadByte();
-                size += (b & 0x7f) << bits;
-                bits += 7;
-            }
-
-            this.Size = size;
-            this.Type = GetTypeString(type);
-        }
-
-        private static string GetTypeString(int type)
-        {
-            switch (type)
-            {
-                case 1:
-                    return "commit";
-                case 2:
-                    return "tree";
-                case 3:
-                    return "blob";
-                case 4:
-                    return "tag";
-                case 6: 
-                    return "ofs_delta";
-                case 7:
-                    return "ref_delta";
-                default:
-                    throw new InvalidOperationException(string.Format("invalid type: {0}", type));
-            }
         }
     }
 

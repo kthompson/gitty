@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -7,7 +8,7 @@ namespace Gitty
 {
     public abstract class ObjectLoader
     {
-        public string Type { get; protected set; }
+        public virtual ObjectType Type { get; protected set; }
         public long Size { get; protected  set; }
 
         public delegate void ContentLoader(Stream stream, ObjectLoader loader);
@@ -45,24 +46,9 @@ namespace Gitty
                        };
         }
 
-        public static ContentLoader DefaultContentLoader(Stream stream)
+        protected static ObjectType ObjectTypeFromString(string type)
         {
-            return (read, loadInfo) =>
-                       {
-                           var size = loadInfo.Size;
-                           while (size > 0)
-                           {
-                               var bsize = size > 4096 ? 4096 : size;
-                               var buffer = new byte[bsize];
-                               var rsize = read.Read(buffer, 0, buffer.Length);
-                               if (rsize == 0)
-                                   return;
-
-                               size -= rsize;
-                               stream.Write(buffer, 0, rsize);
-                           }
-                           stream.Position = 0;
-                       };
+            return (ObjectType)Enum.Parse(typeof(ObjectType), type, true);
         }
     }
 }

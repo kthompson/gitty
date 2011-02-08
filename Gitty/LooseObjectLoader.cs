@@ -42,7 +42,7 @@ namespace Gitty
                     }
                     sb.Append(c);
                 }
-                this.Type = type;
+                this.Type = ObjectTypeFromString(type);
                 this.Size = size;
 
                 if (contentLoader != null)

@@ -11,7 +11,6 @@ namespace Gitty
     {
         public static long Read7BitEncodedInt(this Stream file, long seed = 0, int bits = 0)
         {
-
             long result = seed;
 
             if (bits > 0)

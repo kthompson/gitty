@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Gitty.Tests
 {
-    public sealed class TestHelper
+    public static class TestHelper
     {
         public static readonly string ArtifactsPath = Path.Combine("..", "..", "Artifacts");
         public static readonly string ObjectsPath = Path.Combine(ArtifactsPath, "objects");
