@@ -18,6 +18,11 @@ namespace Gitty
             this.Base = baseLoader;
             this.RawType = type;
         }
+
+        public override void Load(ContentLoader contentLoader = null)
+        {
+            this.Base.Load(stream => { });
+        }
     }
 
     class DeltaOffsetPackedObjectLoader : DeltaPackedObjectLoader
@@ -26,11 +31,6 @@ namespace Gitty
             : base(packFile, objectOffset, dataOffset, size, type, packFile.GetObjectLoader(baseOffset))
         {
         }
-
-        public override void Load(ContentLoader contentLoader = null)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     class DeltaReferencePackedObjectLoader : DeltaPackedObjectLoader
@@ -38,11 +38,6 @@ namespace Gitty
         public DeltaReferencePackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, ObjectType type, string baseId)
             : base(packFile, objectOffset, dataOffset, size, type, packFile.GetObjectLoader(baseId))
         {
-        }
-
-        public override void Load(ContentLoader contentLoader = null)
-        {
-            throw new NotImplementedException();
         }
     }
 }

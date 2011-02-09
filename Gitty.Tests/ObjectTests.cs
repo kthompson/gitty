@@ -11,11 +11,11 @@ namespace Gitty.Tests
     public class ObjectTests
     {
         [Test]
-        public void RepositoryCanLoadDeltaObjects()
+        public void RepositoryCanLoadDeltaObjects(
+            [Values("b1f187c2e9acaba942639bca90a63c5b4f058967")]string id)
         {
             using(TestHelper.WorkingTree())
             {
-                var id = "b1f187c2e9acaba942639bca90a63c5b4f058967";
                 var content = TestHelper.Git.CatFile("blob", id);
 
                 var git = Git.Open(TestHelper.WorkingDirectory);
@@ -26,13 +26,10 @@ namespace Gitty.Tests
 
                 Assert.NotNull(blob);
 
-                blob.GetContentStream((stream, loader) =>
+                blob.GetContentStream((stream, info) =>
                                           {
-                                              using(var reader = new StreamReader(stream))
-                                              {
-                                                  var actual = reader.ReadToEnd();
-                                                  Assert.AreEqual(content, actual);
-                                              }
+                                              var actual = TestHelper.ReadToEndOfStream(stream);
+                                              Assert.AreEqual(content, actual);
                                           });
             }
         }

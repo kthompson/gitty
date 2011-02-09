@@ -76,11 +76,11 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            this._loader.Load((stream, info) =>
+            this._loader.Load(stream =>
             {
                 var bytesRead = 0;
                 
-                while (bytesRead < info.Size)
+                while (bytesRead < _loader.Size)
                 {
                     //read until space for mode
                     var mode = stream.ReadUntil(c => c == ' ');

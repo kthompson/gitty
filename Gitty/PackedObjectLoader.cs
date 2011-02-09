@@ -10,15 +10,12 @@ namespace Gitty
         public long ObjectOffset { get; private set; }
         public long DataOffset { get; private set; }
 
-        private ObjectLoader _base;
-
         protected PackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, ObjectType type)
+            : base(type, size)
         {
             this.PackFile = packFile;
-            this.Type = type;
             this.ObjectOffset = objectOffset;
             this.DataOffset = dataOffset;
-            this.Size = size;
         }
 
         public static PackedObjectLoader Create(PackFile packFile, long objectOffset)
@@ -66,21 +63,6 @@ namespace Gitty
                 }
                 
             }
-        }
-
-        private void LoadDelta(FileStream file, ContentLoader contentLoader)
-        {
-            var offset = this.ObjectOffset - file.Read7BitEncodedInt();
-            var dataOffset = file.Position;
-
-            var baseObject = this.PackFile.GetObjectLoader(offset);
-            baseObject.Load((stream, loadInfo) =>
-                                        {
-                                            this.Type = loadInfo.Type;
-                                            //this.Size = loadInfo.Size;
-                                            if(contentLoader != null)
-                                                contentLoader(stream, loadInfo);
-                                        });
         }
     }
 

@@ -6,12 +6,18 @@ using System.Text;
 
 namespace Gitty
 {
-    public abstract class ObjectLoader
+    abstract class ObjectLoader : IObjectInfo
     {
         public virtual ObjectType Type { get; protected set; }
         public long Size { get; protected  set; }
 
-        public delegate void ContentLoader(Stream stream, ObjectLoader loader);
+        public delegate void ContentLoader(Stream stream);
+
+        protected ObjectLoader(ObjectType type, long size)
+        {
+            this.Type = type;
+            this.Size = size;
+        }
 
         public abstract void Load(ContentLoader contentLoader = null);
 
@@ -32,16 +38,16 @@ namespace Gitty
         public static ContentLoader CompressedContentLoader(ContentLoader loader)
         {
             if (loader == null)
-                return (stream, objectLoader) => { };
+                return stream => { };
 
-            return (stream, objectLoader) =>
+            return stream =>
                        {
                            using (
                                var compressed = new CompressionStream(stream,
                                                                       CompressionMode.Decompress,
                                                                       true))
                            {
-                               loader(compressed, objectLoader);
+                               loader(compressed);
                            }
                        };
         }
@@ -50,5 +56,11 @@ namespace Gitty
         {
             return (ObjectType)Enum.Parse(typeof(ObjectType), type, true);
         }
+    }
+
+    public interface IObjectInfo
+    {
+        ObjectType Type { get;}
+        long Size { get; }
     }
 }

@@ -126,28 +126,15 @@ namespace Gitty.Tests
 
             Assert.AreEqual("f5f1da3d5aa6aa03479df730c64d5525e5d6d5d8", head.Id);
 
-            var loader = ObjectLoader.Create(git, head.Id);
-            Assert.NotNull(loader);
+            var o = git.OpenObject(head.Id);
+            Assert.NotNull(o);
 
-            loader.Load((stream, loadInfo) =>
-            {
-                Assert.AreEqual(189, loadInfo.Size);
-                Assert.AreEqual("commit", loadInfo.Type);
+            Assert.IsAssignableFrom<Commit>(o);
+            var commit = o as Commit;
+            Assert.NotNull(commit);
 
-                string actual;
-                using (var reader = new StreamReader(stream))
-                {
-                    actual = reader.ReadToEnd();
-                }
-
-                var expected = TestHelper.GetObjectAsString("commit", "f5f1da3d5aa6aa03479df730c64d5525e5d6d5d8");
-
-                Assert.AreEqual(expected, actual);
-            });
-
-            Assert.AreEqual(189, loader.Size);
-            Assert.AreEqual("commit", loader.Type);
-
+            Assert.AreEqual("7ee9583cd8b390caac802ece6c144314ef5fc3bf", commit.Tree.Id);
+            Assert.AreEqual(0, commit.Parents.Length);
         }
 
         [Test]
@@ -243,17 +230,13 @@ namespace Gitty.Tests
 
             Assert.AreEqual(id, blob.Id);
 
-            blob.GetContentStream((stream, info) =>
-            {
-                Assert.AreEqual(47, info.Size);
-                Assert.AreEqual("blob", info.Type);
+            
+            
+            blob.GetContentStream((stream, loader) => {
+                Assert.AreEqual(47, loader.Size);
+                Assert.AreEqual(ObjectType.Blob, loader.Type);                          
 
-                string actual;
-                using (var reader = new StreamReader(stream))
-                {
-                    actual = reader.ReadToEnd();
-                }
-
+                var actual = TestHelper.ReadToEndOfStream(stream);
                 var expected = TestHelper.GetObjectAsString("blob", id);
 
                 Assert.AreEqual(expected, actual);

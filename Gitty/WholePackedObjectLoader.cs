@@ -18,7 +18,7 @@ namespace Gitty
             {
                 file.Seek(this.DataOffset, SeekOrigin.Begin);
 
-                CompressedContentLoader(contentLoader)(file, this);
+                CompressedContentLoader(contentLoader)(file);
             }
         }
     }

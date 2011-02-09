@@ -141,6 +141,16 @@ namespace Gitty.Tests
             return new Temp(() => Environment.SetEnvironmentVariable("GIT_WORK_TREE", string.Empty, EnvironmentVariableTarget.Process));
         }
 
+
+
+        public static string ReadToEndOfStream(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
         class Temp : IDisposable
         {
             private readonly Action _disposeAction;

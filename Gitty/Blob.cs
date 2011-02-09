@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 
@@ -17,9 +18,9 @@ namespace Gitty
             this._loader = loader;
         }
 
-        public void GetContentStream(ObjectLoader.ContentLoader contentLoader)
+        public void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
         {
-            this._loader.Load(contentLoader);
+            this._loader.Load(stream => contentLoader(stream, this._loader));
         }
 
         public ITreeEntry Parent { get; set; }

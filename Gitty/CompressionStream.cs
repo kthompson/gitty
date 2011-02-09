@@ -17,14 +17,19 @@ namespace Gitty
             return stream;
         }
 
-        public CompressionStream(Stream stream, CompressionMode mode, bool leaveOpen)
-            : base(MoveStream(stream), mode, leaveOpen)
+        private static FileStream OpenFile(string fileLocation)
         {
+            return new FileStream(fileLocation, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
+        public CompressionStream(string fileLocation, CompressionMode mode = CompressionMode.Decompress, bool leaveOpen = false)
+            : this(OpenFile(fileLocation), mode, leaveOpen)
+        {
+            
+        }
 
-        public CompressionStream(Stream stream, CompressionMode mode)
-            : base(MoveStream(stream), mode)
+        public CompressionStream(Stream stream, CompressionMode mode = CompressionMode.Decompress, bool leaveOpen = false)
+            : base(MoveStream(stream), mode, leaveOpen)
         {
         }
     }

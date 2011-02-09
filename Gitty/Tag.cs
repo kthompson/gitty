@@ -73,7 +73,7 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            this._loader.Load((stream, info) =>
+            this._loader.Load(stream =>
                                   {
                                       var bytesRead = 0;
                                       var reader = new StreamReader(stream);
@@ -101,7 +101,7 @@ namespace Gitty
                                           }
                                       }
 
-                                      var messageSize = info.Size - bytesRead;
+                                      var messageSize = _loader.Size - bytesRead;
                                       var buffer = new char[messageSize];
                                       var read = reader.Read(buffer, 0, buffer.Length);
                                       this._message = new string(buffer, 0, read);

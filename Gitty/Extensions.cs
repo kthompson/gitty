@@ -56,8 +56,23 @@ namespace Gitty
                 if (predicate(c) || c == -1)
                     return sb.ToString();
 
-                sb.Append((char) c);
+                sb.Append((char)c);
             }
+        }
+
+        public static void SkipUntil(this Stream stream, Predicate<int> predicate)
+        {
+            while (true)
+            {
+                var c = stream.ReadByte();
+                if (predicate(c) || c == -1)
+                    return ;
+            }
+        }
+
+        public static void SkipWhile(this Stream stream, Predicate<int> predicate)
+        {
+            SkipUntil(stream, c => !predicate(c));
         }
 
         public static string ReadWhile(this Stream stream, Predicate<int> predicate)

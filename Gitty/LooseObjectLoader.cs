@@ -8,47 +8,52 @@ namespace Gitty
     class LooseObjectLoader : ObjectLoader
     {
         public string Location { get; private set; }
+        public long DataOffset { get; private set; }
 
-        private LooseObjectLoader(string location)
+        private LooseObjectLoader(string location, ObjectType type, int size, long dataOffset)
+            : base(type, size)
         {
             this.Location = location;
+            this.DataOffset = dataOffset;
         }
 
         public override void Load(ContentLoader contentLoader = null)
         {
-            var size = 0;
-            var type = string.Empty;
-            var inner = new FileStream(this.Location, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            using (var stream = new CompressionStream(inner, CompressionMode.Decompress))
+            using (var stream = new CompressionStream(this.Location))
             {
-                var sb = new StringBuilder();
-                var inHeader = true;
-
-                while (inHeader)
-                {
-                    var c = (char)stream.ReadByte();
-                    switch (c)
-                    {
-                        case ' ':
-                            type = sb.ToString();
-                            sb.Clear();
-                            continue;
-                        case '\0':
-                            size = int.Parse(sb.ToString());
-                            sb.Clear();
-                            inHeader = false;
-                            continue;
-                    }
-                    sb.Append(c);
-                }
-                this.Type = ObjectTypeFromString(type);
-                this.Size = size;
+                stream.SkipUntil(c => c == '\0');
 
                 if (contentLoader != null)
-                    contentLoader(stream, this);
-
+                    contentLoader(stream);
             }
+        }
+
+        private static void ReadHeader(Stream stream, out ObjectType type, out int size)
+        {
+            size = 0;
+            var typeCode = string.Empty;
+            var sb = new StringBuilder();
+            var inHeader = true;
+
+            while (inHeader)
+            {
+                var c = (char)stream.ReadByte();
+                switch (c)
+                {
+                    case ' ':
+                        typeCode = sb.ToString();
+                        sb.Clear();
+                        continue;
+                    case '\0':
+                        size = int.Parse(sb.ToString());
+                        sb.Clear();
+                        inHeader = false;
+                        continue;
+                }
+                sb.Append(c);
+            }
+
+            type = ObjectTypeFromString(typeCode);
         }
 
         public static LooseObjectLoader GetObjectLoader(string objectsLocation, string id)
@@ -56,7 +61,18 @@ namespace Gitty
             var location = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
 
             if (File.Exists(location))
-                return new LooseObjectLoader(location);
+            {
+                var inner = new FileStream(location, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using (var stream = new CompressionStream(inner, CompressionMode.Decompress))
+                {
+                    ObjectType type;
+                    int size;
+                    ReadHeader(stream, out type, out size);
+                    var dataOffset = inner.Position;
+                    return new LooseObjectLoader(location, type, size, dataOffset);
+                }
+            }
+                
 
             return null;
         }
