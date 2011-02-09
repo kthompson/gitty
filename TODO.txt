@@ -1,3 +1,8 @@
 Add packed-refs support
 Add .git/config support
 Add support to switch branches
+Add FileSystemWatcher to monitor changes to the Git Repo/Working tree
+Add ability to get "Status"
+	Changed but not updated => diff between WorkTree and Index for items in Index (git diff-files)
+	Changed and added to the index => diff between HEAD and Index			(git diff-tree)
+	Untracked	=> diff between WorkTree and Index for items NOT in Index	
