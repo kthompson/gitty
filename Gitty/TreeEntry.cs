@@ -2,20 +2,19 @@
 
 namespace Gitty
 {
-    public class TreeEntry : ITreeEntry
+    public abstract class TreeEntry
     {
-        private readonly Repository _repository;
+        protected readonly Repository Repository;
+        protected readonly ObjectLoader Loader;
 
         public string Id { get; private set; }
         public string Mode { get; private set; }
 
-        public ITreeEntry Parent { get; set; }
+        public Tree Parent { get; set; }
 
         public string Name { get; private set; }
 
-        public string Type { get; private set; }
-
-        public ITreeEntry Entry { get; private set; }
+        public abstract ObjectType Type { get; }
 
         private string _fullName;
         public string FullName
@@ -44,25 +43,15 @@ namespace Gitty
             }
         }
 
-        internal TreeEntry(Repository repository, string id, string name, string mode)
+        internal TreeEntry(Repository repository, ObjectLoader loader, string id, string name, string mode, Tree parent)
         {
-            this._repository = repository;
+            this.Repository = repository;
+            this.Loader = loader;
 
             this.Id = id;
             this.Name = name;
             this.Mode = mode;
-            this.Entry = (ITreeEntry)this._repository.OpenObject(id);
-            this.Entry.Parent = this;
-
-            this.Type = this.Entry is Tree ? "tree" : "blob";
-
+            this.Parent = parent;
         }
-    }
-
-    public interface ITreeEntry
-    {
-        ITreeEntry Parent { get; set; }
-        string Name { get;  }
-        string FullName { get; }
     }
 }

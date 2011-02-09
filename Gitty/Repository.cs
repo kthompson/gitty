@@ -211,7 +211,7 @@ namespace Gitty
 
         public object OpenObject(string id)
         {
-            var loader = ObjectLoader.Create(this, id);
+            var loader = OpenObjectLoader(id);
             if (loader == null)
                 return null;
 
@@ -222,7 +222,7 @@ namespace Gitty
                 case ObjectType.Tree:
                     return new Tree(this, loader, id);
                 case ObjectType.Blob:
-                    return new Blob(loader, id);
+                    return new Blob(this, loader, id);
                 case ObjectType.Tag:
                     return new Tag(this, loader, id);
                 case ObjectType.OffsetDelta:
@@ -230,6 +230,32 @@ namespace Gitty
                 default:
                     throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
             }
+        }
+
+        public TreeEntry OpenTreeEntry(string id, string name, string mode, Tree parent)
+        {
+            var loader = OpenObjectLoader(id);
+            if (loader == null)
+                return null;
+
+            switch (loader.Type)
+            {
+                case ObjectType.Tree:
+                    return new Tree(this, loader, id, name, mode, parent);
+                case ObjectType.Blob:
+                    return new Blob(this, loader, id, name, mode, parent);
+                case ObjectType.Commit:
+                case ObjectType.Tag:
+                case ObjectType.OffsetDelta:
+                case ObjectType.ReferenceDelta:
+                default:
+                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
+            }
+        }
+
+        internal ObjectLoader OpenObjectLoader(string id)
+        {
+            return ObjectLoader.Create(this, id);
         }
     }
 }

@@ -180,7 +180,7 @@ namespace Gitty.Tests
             Assert.NotNull(treeItem);
 
             Assert.AreEqual("100644", treeItem.Mode);
-            Assert.AreEqual("blob", treeItem.Type);
+            Assert.AreEqual(ObjectType.Blob, treeItem.Type);
             Assert.AreEqual("0f4a22329fb3970ca4c19d873623c68e937ba16c", treeItem.Id);
             Assert.AreEqual("README", treeItem.Name);
         }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Gitty
 {
-    abstract class ObjectLoader : IObjectInfo
+    public abstract class ObjectLoader : IObjectInfo
     {
         public virtual ObjectType Type { get; protected set; }
         public long Size { get; protected  set; }

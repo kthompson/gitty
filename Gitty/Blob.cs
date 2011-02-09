@@ -5,34 +5,21 @@ using System.Security.AccessControl;
 
 namespace Gitty
 {
-    public class Blob : ITreeEntry
+    public class Blob : TreeEntry
     {
-        private readonly ObjectLoader _loader;
-
-        public string Id { get; private set; }
-
-        internal Blob(ObjectLoader loader, string id)
+        internal Blob(Repository repository, ObjectLoader loader, string id, string name = null, string mode = null, Tree parent = null) 
+            : base(repository, loader, id, name, mode, parent)
         {
-            this.Id = id;
-
-            this._loader = loader;
         }
 
         public void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
         {
-            this._loader.Load(stream => contentLoader(stream, this._loader));
+            this.Loader.Load(stream => contentLoader(stream, this.Loader));
         }
 
-        public ITreeEntry Parent { get; set; }
-
-        public string Name
+        public override ObjectType Type
         {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string FullName
-        {
-            get { throw new NotImplementedException(); }
+            get { return ObjectType.Blob; }
         }
     }
 }

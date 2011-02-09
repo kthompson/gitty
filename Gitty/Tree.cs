@@ -5,18 +5,11 @@ using System.Collections.Generic;
 
 namespace Gitty
 {
-    public class Tree : ITreeEntry
+    public class Tree : TreeEntry
     {
-        private readonly Repository _repository;
-        private readonly ObjectLoader _loader;
-
-        public string Id { get; private set; }
-
-        internal Tree(Repository repository, ObjectLoader loader, string id)
+        internal Tree(Repository repository, ObjectLoader loader, string id, string name = null, string mode = null, Tree parent = null)
+            : base(repository, loader, id, name, mode, parent)
         {
-            _repository = repository;
-            _loader = loader;
-            this.Id = id;
         }
 
         private readonly List<TreeEntry> _items = new List<TreeEntry>();
@@ -53,22 +46,15 @@ namespace Gitty
             if (!recursive)
                 return this.Items;
 
-            return FlattenTree(this.Items, entry => entry.Type == "blob",
-                               entry => ((Tree) entry.Entry).EnumerateItems(recursive));
+            return FlattenTree(this.Items, entry => entry.Type == ObjectType.Blob,
+                                           entry => ((Tree) entry).EnumerateItems(recursive));
         }
 
         private bool _loaded;
 
-        public ITreeEntry Parent { get; set; }
-
-        public string Name
+        public override ObjectType Type
         {
-            get { return this.Parent.Try(o => o.Name); }
-        }
-
-        public string FullName
-        {
-            get { return this.Parent.Try(o => o.FullName); }
+            get { return ObjectType.Tree; }
         }
 
         private void EnsureLoaded()
@@ -76,11 +62,11 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            this._loader.Load(stream =>
+            this.Loader.Load(stream =>
             {
                 var bytesRead = 0;
                 
-                while (bytesRead < _loader.Size)
+                while (bytesRead < Loader.Size)
                 {
                     //read until space for mode
                     var mode = stream.ReadUntil(c => c == ' ');
@@ -89,7 +75,7 @@ namespace Gitty
                     bytesRead += name.Length + 1;
                     var id = stream.ReadId();
                     bytesRead += 20;
-                    var entry = new TreeEntry(this._repository, id, name, mode) {Parent = this};
+                    var entry = this.Repository.OpenTreeEntry(id, name, mode, this);
                     this._items.Add(entry);
                 }
             });
