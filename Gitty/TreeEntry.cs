@@ -1,11 +1,12 @@
 ﻿using System;
+using Gitty.Storage;
 
 namespace Gitty
 {
     public abstract class TreeEntry
     {
         protected readonly Repository Repository;
-        protected readonly ObjectLoader Loader;
+        protected readonly ObjectReader Reader;
 
         public string Id { get; private set; }
         public string Mode { get; private set; }
@@ -43,10 +44,10 @@ namespace Gitty
             }
         }
 
-        internal TreeEntry(Repository repository, ObjectLoader loader, string id, string name, string mode, Tree parent)
+        internal TreeEntry(Repository repository, ObjectReader reader, string id, string name, string mode, Tree parent)
         {
             this.Repository = repository;
-            this.Loader = loader;
+            this.Reader = reader;
 
             this.Id = id;
             this.Name = name;

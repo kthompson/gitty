@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
-namespace Gitty
+namespace Gitty.Storage
 {
-    abstract class PackedObjectLoader : ObjectLoader
+    abstract class PackedObjectReader : ObjectReader
     {
         public PackFile PackFile { get; private set; }
 
         public long ObjectOffset { get; private set; }
         public long DataOffset { get; private set; }
 
-        protected PackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, ObjectType type)
+        protected PackedObjectReader(PackFile packFile, long objectOffset, long dataOffset, long size, ObjectType type)
             : base(type, size)
         {
             this.PackFile = packFile;
@@ -18,7 +17,7 @@ namespace Gitty
             this.DataOffset = dataOffset;
         }
 
-        public static PackedObjectLoader Create(PackFile packFile, long objectOffset)
+        public static PackedObjectReader Create(PackFile packFile, long objectOffset)
         {
             using (var file = File.OpenRead(packFile.Location))
             {
@@ -44,15 +43,15 @@ namespace Gitty
                     case ObjectType.Commit:
                     case ObjectType.Tag:
                     case ObjectType.Tree:
-                        return new WholePackedObjectLoader(packFile, objectOffset, file.Position, size, type);
+                        return new WholePackedObjectReader(packFile, objectOffset, file.Position, size, type);
 
                     case ObjectType.OffsetDelta:
                         var baseOffset = objectOffset - file.Read7BitEncodedInt();
-                        return new DeltaOffsetPackedObjectLoader(packFile, objectOffset, file.Position, size, type, baseOffset);
+                        return new DeltaOffsetPackedObjectReader(packFile, objectOffset, file.Position, size, type, baseOffset);
 
                     case ObjectType.ReferenceDelta:
                         var baseId = file.ReadId();
-                        return new DeltaReferencePackedObjectLoader(packFile, objectOffset, file.Position, size, type, baseId);
+                        return new DeltaReferencePackedObjectReader(packFile, objectOffset, file.Position, size, type, baseId);
 
                     case ObjectType.Undefined:
                         throw new InvalidDataException("ObjectType was undefined.");

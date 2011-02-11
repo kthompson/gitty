@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 
-namespace Gitty
+namespace Gitty.Storage
 {
     class PackFile
     {
@@ -90,15 +89,15 @@ namespace Gitty
             return this.Index.GetEntry(id) != null;
         }
 
-        public PackedObjectLoader GetObjectLoader(string id)
+        public PackedObjectReader GetObjectLoader(string id)
         {
             var info = this.Index.GetEntry(id);
             return GetObjectLoader(info.Offset);
         }
 
-        public PackedObjectLoader GetObjectLoader(long offset)
+        public PackedObjectReader GetObjectLoader(long offset)
         {
-            return PackedObjectLoader.Create(this, offset);
+            return PackedObjectReader.Create(this, offset);
         }
     }
 }

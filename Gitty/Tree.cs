@@ -3,13 +3,14 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Gitty.Storage;
 
 namespace Gitty
 {
     public class Tree : TreeEntry
     {
-        internal Tree(Repository repository, ObjectLoader loader, string id, string name = null, string mode = null, Tree parent = null)
-            : base(repository, loader, id, name, mode, parent)
+        internal Tree(Repository repository, ObjectReader reader, string id, string name = null, string mode = null, Tree parent = null)
+            : base(repository, reader, id, name, mode, parent)
         {
         }
 
@@ -62,11 +63,11 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            this.Loader.Load(stream =>
+            this.Reader.Load(stream =>
             {
                 var bytesRead = 0;
                 
-                while (bytesRead < Loader.Size)
+                while (bytesRead < Reader.Size)
                 {
                     //read until space for mode
                     var mode = stream.ReadUntil(c => c == ' ');
@@ -131,7 +132,7 @@ namespace Gitty
 
         protected override void EnsureLoaded()
         {
-            //dont use the object loader in the base class
+            //dont use the object reader in the base class
         }
     }
 
@@ -147,7 +148,7 @@ namespace Gitty
 
         public override void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
         {
-            //dont use the object loader in the base class
+            //dont use the object reader in the base class
 
         }
     }y

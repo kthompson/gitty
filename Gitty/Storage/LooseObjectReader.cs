@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace Gitty
+namespace Gitty.Storage
 {
-    class LooseObjectLoader : ObjectLoader
+    class LooseObjectReader : ObjectReader
     {
         public string Location { get; private set; }
         public long DataOffset { get; private set; }
 
-        private LooseObjectLoader(string location, ObjectType type, int size, long dataOffset)
+        private LooseObjectReader(string location, ObjectType type, int size, long dataOffset)
             : base(type, size)
         {
             this.Location = location;
@@ -56,7 +55,7 @@ namespace Gitty
             type = ObjectTypeFromString(typeCode);
         }
 
-        public static LooseObjectLoader GetObjectLoader(string objectsLocation, string id)
+        public static LooseObjectReader GetObjectLoader(string objectsLocation, string id)
         {
             var location = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
 
@@ -69,7 +68,7 @@ namespace Gitty
                     int size;
                     ReadHeader(stream, out type, out size);
                     var dataOffset = inner.Position;
-                    return new LooseObjectLoader(location, type, size, dataOffset);
+                    return new LooseObjectReader(location, type, size, dataOffset);
                 }
             }
                 

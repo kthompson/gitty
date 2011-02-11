@@ -1,12 +1,10 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
+﻿using System.IO;
 
-namespace Gitty
+namespace Gitty.Storage
 {
-    class WholePackedObjectLoader : PackedObjectLoader
+    class WholePackedObjectReader : PackedObjectReader
     {
-        public WholePackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, int size, ObjectType type)
+        public WholePackedObjectReader(PackFile packFile, long objectOffset, long dataOffset, int size, ObjectType type)
             : base(packFile, objectOffset, dataOffset, size, type)
         {
 

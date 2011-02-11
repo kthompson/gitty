@@ -2,18 +2,17 @@
 using System.Linq;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 
-namespace Gitty
+namespace Gitty.Storage
 {
-    public abstract class ObjectLoader : IObjectInfo
+    public abstract class ObjectReader : IObjectInfo
     {
         public virtual ObjectType Type { get; protected set; }
         public long Size { get; protected  set; }
 
         public delegate void ContentLoader(Stream stream);
 
-        protected ObjectLoader(ObjectType type, long size)
+        protected ObjectReader(ObjectType type, long size)
         {
             this.Type = type;
             this.Size = size;
@@ -21,9 +20,9 @@ namespace Gitty
 
         public abstract void Load(ContentLoader contentLoader = null);
 
-        public static ObjectLoader Create(Repository repository, string id)
+        public static ObjectReader Create(Repository repository, string id)
         {
-            var loader = LooseObjectLoader.GetObjectLoader(repository.ObjectsLocation, id);
+            var loader = LooseObjectReader.GetObjectLoader(repository.ObjectsLocation, id);
             if (loader != null)
                 return loader;
 

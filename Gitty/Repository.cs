@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Gitty.Storage;
 
 namespace Gitty
 {
@@ -253,9 +254,9 @@ namespace Gitty
             }
         }
 
-        internal ObjectLoader OpenObjectLoader(string id)
+        internal ObjectReader OpenObjectLoader(string id)
         {
-            return ObjectLoader.Create(this, id);
+            return ObjectReader.Create(this, id);
         }
     }
 }

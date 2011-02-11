@@ -1,17 +1,18 @@
 ﻿using System;
 using System.IO;
+using Gitty.Storage;
 
 namespace Gitty
 {
     public class Tag
     {
         private readonly Repository _repository;
-        private readonly ObjectLoader _loader;
+        private readonly ObjectReader _reader;
 
-        internal Tag(Repository repository, ObjectLoader loader, string id)
+        internal Tag(Repository repository, ObjectReader reader, string id)
         {
             _repository = repository;
-            _loader = loader;
+            _reader = reader;
             this.Id = id;
         }
 
@@ -73,7 +74,7 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            this._loader.Load(stream =>
+            this._reader.Load(stream =>
                                   {
                                       var bytesRead = 0;
                                       var reader = new StreamReader(stream);
@@ -101,7 +102,7 @@ namespace Gitty
                                           }
                                       }
 
-                                      var messageSize = _loader.Size - bytesRead;
+                                      var messageSize = _reader.Size - bytesRead;
                                       var buffer = new char[messageSize];
                                       var read = reader.Read(buffer, 0, buffer.Length);
                                       this._message = new string(buffer, 0, read);

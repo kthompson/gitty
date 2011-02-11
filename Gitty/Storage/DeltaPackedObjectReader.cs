@@ -1,21 +1,19 @@
-﻿using System;
-
-namespace Gitty
+﻿namespace Gitty.Storage
 {
-    abstract class DeltaPackedObjectLoader : PackedObjectLoader
+    abstract class DeltaPackedObjectReader : PackedObjectReader
     {
         public abstract ObjectType RawType { get; }
-        public PackedObjectLoader Base { get; private set; }
+        public PackedObjectReader Base { get; private set; }
 
         public override ObjectType Type
         {
             get { return this.Base.Type; }
         }
 
-        protected DeltaPackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, PackedObjectLoader baseLoader)
+        protected DeltaPackedObjectReader(PackFile packFile, long objectOffset, long dataOffset, long size, PackedObjectReader baseReader)
             : base(packFile, objectOffset, dataOffset, size, ObjectType.Undefined)
         {
-            this.Base = baseLoader;
+            this.Base = baseReader;
         }
 
         public override void Load(ContentLoader contentLoader = null)
@@ -26,10 +24,10 @@ namespace Gitty
         }
     }
 
-    class DeltaOffsetPackedObjectLoader : DeltaPackedObjectLoader
+    class DeltaOffsetPackedObjectReader : DeltaPackedObjectReader
     {
         
-        public DeltaOffsetPackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, long baseOffset)
+        public DeltaOffsetPackedObjectReader(PackFile packFile, long objectOffset, long dataOffset, long size, long baseOffset)
             : base(packFile, objectOffset, dataOffset, size, packFile.GetObjectLoader(baseOffset))
         {
         }
@@ -40,9 +38,9 @@ namespace Gitty
         }
     }
 
-    class DeltaReferencePackedObjectLoader : DeltaPackedObjectLoader
+    class DeltaReferencePackedObjectReader : DeltaPackedObjectReader
     {
-        public DeltaReferencePackedObjectLoader(PackFile packFile, long objectOffset, long dataOffset, long size, string baseId)
+        public DeltaReferencePackedObjectReader(PackFile packFile, long objectOffset, long dataOffset, long size, string baseId)
             : base(packFile, objectOffset, dataOffset, size, packFile.GetObjectLoader(baseId))
         {
         }

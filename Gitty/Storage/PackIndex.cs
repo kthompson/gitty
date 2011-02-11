@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 
-namespace Gitty
+namespace Gitty.Storage
 {
     public class PackIndex
     {

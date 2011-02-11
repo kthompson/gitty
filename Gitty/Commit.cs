@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Gitty.Storage;
 
 namespace Gitty
 {
     public class Commit
     {
         private readonly Repository _repository;
-        private readonly ObjectLoader _loader;
+        private readonly ObjectReader _reader;
 
         private Tree _tree;
         public Tree Tree
@@ -61,10 +62,10 @@ namespace Gitty
 
         public string Id { get; private set; }
 
-        internal Commit(Repository repository, ObjectLoader loader, string id)
+        internal Commit(Repository repository, ObjectReader reader, string id)
         {
             _repository = repository;
-            _loader = loader;
+            _reader = reader;
 
             this.Id = id;
             this._parents = new List<Commit>();
@@ -76,7 +77,7 @@ namespace Gitty
             if (_loaded) 
                 return;
 
-            this._loader.Load(stream =>
+            this._reader.Load(stream =>
                                   {
                                       var bytesRead = 0;
                                       var reader = new StreamReader(stream);
@@ -106,7 +107,7 @@ namespace Gitty
                                           }
                                       }
 
-                                      var messageSize = this._loader.Size - bytesRead;
+                                      var messageSize = this._reader.Size - bytesRead;
                                       var buffer = new char[messageSize];
                                       var read = reader.Read(buffer, 0, buffer.Length);
                                       this._message = new string(buffer, 0, read);
