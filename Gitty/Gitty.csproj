@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractObject.cs" />
     <Compile Include="BinaryDelta.cs" />
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Storage\LooseObjectReader.cs" />
     <Compile Include="Storage\ObjectReader.cs" />
     <Compile Include="ObjectType.cs" />
+    <Compile Include="Storage\ObjectStorage.cs" />
     <Compile Include="Storage\PackedObjectReader.cs" />
     <Compile Include="Storage\PackFile.cs" />
     <Compile Include="Storage\PackIndex.cs" />

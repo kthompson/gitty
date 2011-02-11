@@ -7,79 +7,86 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Tree : TreeEntry
+    public class Tree : AbstractObject
     {
-        internal Tree(Repository repository, ObjectReader reader, string id, string name = null, string mode = null, Tree parent = null)
-            : base(repository, reader, id, name, mode, parent)
+        private readonly ObjectStorage _storage;
+        public long Size { get; private set; }
+
+        internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader)
+            : base(ObjectType.Tree, id)
         {
+            this.Size = size;
+            this._storage = storage;
+            this._loader = new Lazy<byte[]>(loader);
         }
 
-        private readonly List<TreeEntry> _items = new List<TreeEntry>();
-        public virtual IEnumerable<TreeEntry> Items
+        private readonly Lazy<byte[]> _loader;
+        public byte[] Data
         {
-            get
-            {
-                this.EnsureLoaded();
-                return _items.AsReadOnly();
-            }
+            get { return _loader.Value; }
         }
 
-        private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T,bool> filter, Func<T, IEnumerable<T>> selector)
-        {
-            foreach (var entry in entries)
-            {
-                if (filter(entry))
-                {
-                    yield return entry;
-                }
-                else
-                {
-                    foreach (var subentry in FlattenTree(selector(entry), filter, selector))
-                    {
-                        yield return subentry;
-                    }
-                }
-            }
-        }
+        private readonly List<ITreeEntry<AbstractObject>> _items = new List<ITreeEntry<AbstractObject>>();
+        //public virtual IEnumerable<TreeEntry<AbstractObject>> Items
+        //{
+        //    get
+        //    {
+        //        this.EnsureLoaded();
+        //        return _items.AsReadOnly();
+        //    }
+        //}
 
-        public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
-        {
-            if (!recursive)
-                return this.Items;
+        //private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T,bool> filter, Func<T, IEnumerable<T>> selector)
+        //{
+        //    foreach (var entry in entries)
+        //    {
+        //        if (filter(entry))
+        //        {
+        //            yield return entry;
+        //        }
+        //        else
+        //        {
+        //            foreach (var subentry in FlattenTree(selector(entry), filter, selector))
+        //            {
+        //                yield return subentry;
+        //            }
+        //        }
+        //    }
+        //}
 
-            return FlattenTree(this.Items, entry => entry.Type == ObjectType.Blob,
-                                           entry => ((Tree) entry).EnumerateItems(recursive));
-        }
+        //public IEnumerable<TreeEntry<AbstractObject>> EnumerateItems(bool recursive = false)
+        //{
+        //    if (!recursive)
+        //        return this.Items;
+
+        //    return FlattenTree(this.Items, blob => blob.Type == ObjectType.Blob,
+        //                                   tree => ((Tree)tree.Entry).EnumerateItems(recursive));
+        //}
 
         private bool _loaded;
 
-        public override ObjectType Type
-        {
-            get { return ObjectType.Tree; }
-        }
-
-        protected virtual void EnsureLoaded()
+        private void EnsureLoaded()
         {
             if (_loaded)
                 return;
 
-            this.Reader.Load(stream =>
+            var stream = new MemoryStream(this.Data);
+
+            var bytesRead = 0;
+
+            while (bytesRead < this.Size)
             {
-                var bytesRead = 0;
-                
-                while (bytesRead < Reader.Size)
-                {
-                    //read until space for mode
-                    var mode = stream.ReadUntil(c => c == ' ');
-                    bytesRead += mode.Length + 1;
-                    var name = stream.ReadUntil(c => c == '\0');
-                    bytesRead += name.Length + 1;
-                    var id = stream.ReadId();
-                    bytesRead += 20;
-                    var entry = this.Repository.OpenTreeEntry(id, name, mode, this);
-                    this._items.Add(entry);
-                }
-            });
+                //read until space for mode
+                var mode = stream.ReadUntil(c => c == ' ');
+                bytesRead += mode.Length + 1;
+                var name = stream.ReadUntil(c => c == '\0');
+                bytesRead += name.Length + 1;
+                var entryId = stream.ReadId();
+                bytesRead += 20;
+                var entry = _storage.Read(entryId);
+                if (entry is Tree)
+                    this._items.Add(new TreeEntry<Tree>((Tree) entry, name, mode, this));
+            }
 
             this._loaded = true;
         }
@@ -87,13 +94,6 @@ namespace Gitty
 
     class WorkingTreeHelper
     {
-        public static TreeEntry GetWorkingTreeEntry(Repository repo, Tree parent, FileSystemInfo info)
-        {
-            if (info is FileInfo)
-                return new WorkingTreeBlob(repo, (FileInfo)info, parent);
-
-            return new WorkingTreeTree(repo, (DirectoryInfo)info, parent);
-        }
 
         public static bool NotIgnored(Repository repo, FileSystemInfo info)
         {
@@ -106,50 +106,4 @@ namespace Gitty
             throw new NotImplementedException();
         }
     }
-
-    class WorkingTreeTree : Tree
-    {
-        public DirectoryInfo Directory { get; private set; }
-
-        public WorkingTreeTree(Repository repository, DirectoryInfo info, Tree parent)
-            : base(repository, null, null, info.Name, WorkingTreeHelper.ModeForFileSystemInfo(info), parent)
-        {
-            this.Directory = info;
-        }
-
-        public override IEnumerable<TreeEntry> Items
-        {
-            get
-            {
-                var repo = this.Repository;
-
-                return this.Directory
-                        .EnumerateFileSystemInfos()
-                        .Where(info => WorkingTreeHelper.NotIgnored(repo, info))
-                        .Select(info => WorkingTreeHelper.GetWorkingTreeEntry(repo, this, info));
-            }
-        }
-
-        protected override void EnsureLoaded()
-        {
-            //dont use the object reader in the base class
-        }
-    }
-
-    class WorkingTreeBlob : Blob
-    {
-        public FileInfo File { get; private set; }
-
-        public WorkingTreeBlob(Repository repository, FileInfo info, Tree parent)
-            : base(repository, null, null, info.Name, WorkingTreeHelper.ModeForFileSystemInfo(info), parent)
-        {
-            File = info;
-        }
-
-        public override void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
-        {
-            //dont use the object reader in the base class
-
-        }
-    }y
 }

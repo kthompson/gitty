@@ -1,21 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using Gitty.Storage;
 
 namespace Gitty
 {
-    public abstract class TreeEntry
+    public class TreeEntry<T> : AbstractObject, ITreeEntry<T>
+        where T : AbstractObject
     {
-        protected readonly Repository Repository;
-        protected readonly ObjectReader Reader;
-
-        public string Id { get; private set; }
         public string Mode { get; private set; }
 
-        public Tree Parent { get; set; }
+        public Tree Parent { get; private set; }
 
+        public T Entry { get; set; }
         public string Name { get; private set; }
-
-        public abstract ObjectType Type { get; }
 
         private string _fullName;
         public string FullName
@@ -44,15 +41,24 @@ namespace Gitty
             }
         }
 
-        internal TreeEntry(Repository repository, ObjectReader reader, string id, string name, string mode, Tree parent)
+        internal TreeEntry(T entry, string name, string mode, Tree parent) 
+            : base(entry.Type, entry.Id)
         {
-            this.Repository = repository;
-            this.Reader = reader;
-
-            this.Id = id;
+            this.Entry = entry;
             this.Name = name;
             this.Mode = mode;
             this.Parent = parent;
         }
+    }
+
+    public interface ITreeEntry<out T>
+    {
+        Tree Parent { get; }
+        string Mode { get; }
+        string Name { get; }
+
+        T Entry { get; }
+
+        string FullName { get; }
     }
 }

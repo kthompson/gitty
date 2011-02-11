@@ -149,6 +149,8 @@ namespace Gitty
         public string HooksLocation { get; private set; }
         public string InfoLocation { get; private set; }
 
+        private ObjectStorage _storage;
+
         public Head Head
         {
             get { return new Head(this); }
@@ -210,49 +212,53 @@ namespace Gitty
             }
         }
 
-        public object OpenObject(string id)
-        {
-            var loader = OpenObjectLoader(id);
-            if (loader == null)
-                return null;
+        //public object OpenObject(string id)
+        //{
+        //    var loader = OpenObjectLoader(id);
+        //    if (loader == null)
+        //        return null;
 
-            switch (loader.Type)
-            {
-                case ObjectType.Commit:
-                    return new Commit(this, loader, id);
-                case ObjectType.Tree:
-                    return new Tree(this, loader, id);
-                case ObjectType.Blob:
-                    return new Blob(this, loader, id);
-                case ObjectType.Tag:
-                    return new Tag(this, loader, id);
-                case ObjectType.OffsetDelta:
-                case ObjectType.ReferenceDelta:
-                default:
-                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
-            }
-        }
+        //    switch (loader.Type)
+        //    {
+        //        case ObjectType.Commit:
+        //            return new Commit(this, loader, id);
+        //        case ObjectType.Tree:
+        //            return new Tree(id, 0, null);
+        //        case ObjectType.Blob:
+        //            //TODO: fix this
+        //            return new Blob(id, 0, null);
+        //        case ObjectType.Tag:
+        //            return new Tag(this, loader, id);
+        //        case ObjectType.OffsetDelta:
+        //        case ObjectType.ReferenceDelta:
+        //        default:
+        //            throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
+        //    }
+        //}
 
-        public TreeEntry OpenTreeEntry(string id, string name, string mode, Tree parent)
-        {
-            var loader = OpenObjectLoader(id);
-            if (loader == null)
-                return null;
+        
 
-            switch (loader.Type)
-            {
-                case ObjectType.Tree:
-                    return new Tree(this, loader, id, name, mode, parent);
-                case ObjectType.Blob:
-                    return new Blob(this, loader, id, name, mode, parent);
-                case ObjectType.Commit:
-                case ObjectType.Tag:
-                case ObjectType.OffsetDelta:
-                case ObjectType.ReferenceDelta:
-                default:
-                    throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
-            }
-        }
+        //public TreeEntry<T> OpenTreeEntry<T>(string id, string name, string mode, Tree parent)
+        //    where T : AbstractObject
+        //{
+        //    var loader = OpenObjectLoader(id);
+        //    if (loader == null)
+        //        return null;
+
+        //    switch (loader.Type)
+        //    {
+        //        case ObjectType.Tree:
+        //            return new Tree(this, id, name, mode, parent);
+        //        case ObjectType.Blob:
+        //            return new Blob(id, name, mode, parent);
+        //        case ObjectType.Commit:
+        //        case ObjectType.Tag:
+        //        case ObjectType.OffsetDelta:
+        //        case ObjectType.ReferenceDelta:
+        //        default:
+        //            throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
+        //    }
+        //}
 
         internal ObjectReader OpenObjectLoader(string id)
         {

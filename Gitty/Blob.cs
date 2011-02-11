@@ -6,21 +6,21 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Blob : TreeEntry
+    public class Blob : AbstractObject
     {
-        internal Blob(Repository repository, ObjectReader reader, string id, string name = null, string mode = null, Tree parent = null) 
-            : base(repository, reader, id, name, mode, parent)
+        public long Size { get; private set; }
+
+        internal Blob(string id, long size, Func<byte[]> loader) 
+            : base(ObjectType.Blob, id)
         {
+            _loader = new Lazy<byte[]>(loader);
+            this.Size = size;
         }
 
-        public virtual void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
+        private readonly Lazy<byte[]> _loader;
+        public byte[] Data
         {
-            this.Reader.Load(stream => contentLoader(stream, this.Reader));
-        }
-
-        public override ObjectType Type
-        {
-            get { return ObjectType.Blob; }
+            get { return _loader.Value; }
         }
     }
 }

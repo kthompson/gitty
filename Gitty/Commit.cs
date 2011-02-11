@@ -7,7 +7,7 @@ namespace Gitty
 {
     public class Commit
     {
-        private readonly Repository _repository;
+        private readonly ObjectStorage _storage;
         private readonly ObjectReader _reader;
 
         private Tree _tree;
@@ -62,9 +62,9 @@ namespace Gitty
 
         public string Id { get; private set; }
 
-        internal Commit(Repository repository, ObjectReader reader, string id)
+        internal Commit(ObjectStorage storage, ObjectReader reader, string id)
         {
-            _repository = repository;
+            _storage = storage;
             _reader = reader;
 
             this.Id = id;
@@ -89,7 +89,7 @@ namespace Gitty
                                           switch (parts[0])
                                           {
                                               case "tree":
-                                                  this._tree = _repository.OpenObject(parts[1]) as Tree;
+                                                  this._tree = _storage.Read<Tree>(parts[1]);
                                                   break;
                                               case "author":
                                                   this._author = parts[1];
@@ -98,7 +98,7 @@ namespace Gitty
                                                   this._commiter = parts[1];
                                                   break;
                                               case "parent":
-                                                  var parent = _repository.OpenObject(parts[1]) as Commit;
+                                                  var parent = _storage.Read<Commit>(parts[1]);
                                                   if(parent != null)
                                                       this._parents.Add(parent);
                                                   break;

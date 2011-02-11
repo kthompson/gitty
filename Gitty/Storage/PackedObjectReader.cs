@@ -47,11 +47,11 @@ namespace Gitty.Storage
 
                     case ObjectType.OffsetDelta:
                         var baseOffset = objectOffset - file.Read7BitEncodedInt();
-                        return new DeltaOffsetPackedObjectReader(packFile, objectOffset, file.Position, size, type, baseOffset);
+                        return new DeltaOffsetPackedObjectReader(packFile, objectOffset, file.Position, size, baseOffset);
 
                     case ObjectType.ReferenceDelta:
                         var baseId = file.ReadId();
-                        return new DeltaReferencePackedObjectReader(packFile, objectOffset, file.Position, size, type, baseId);
+                        return new DeltaReferencePackedObjectReader(packFile, objectOffset, file.Position, size, baseId);
 
                     case ObjectType.Undefined:
                         throw new InvalidDataException("ObjectType was undefined.");

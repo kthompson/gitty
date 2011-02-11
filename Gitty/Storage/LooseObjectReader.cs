@@ -57,23 +57,31 @@ namespace Gitty.Storage
 
         public static LooseObjectReader GetObjectLoader(string objectsLocation, string id)
         {
-            var location = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
+            var location = ObjectExists(objectsLocation, id);
+            if (location == null)
+                return null;
 
-            if (File.Exists(location))
+
+            var inner = new FileStream(Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2)),
+                                       FileMode.Open, FileAccess.Read, FileShare.Read);
+            using (var stream = new CompressionStream(inner))
             {
-                var inner = new FileStream(location, FileMode.Open, FileAccess.Read, FileShare.Read);
-                using (var stream = new CompressionStream(inner, CompressionMode.Decompress))
-                {
-                    ObjectType type;
-                    int size;
-                    ReadHeader(stream, out type, out size);
-                    var dataOffset = inner.Position;
-                    return new LooseObjectReader(location, type, size, dataOffset);
-                }
+                ObjectType type;
+                int size;
+                ReadHeader(stream, out type, out size);
+                var dataOffset = inner.Position;
+                return new LooseObjectReader(location, type, size, dataOffset);
             }
-                
+        }
+
+        private static string ObjectExists(string objectsLocation, string id)
+        {
+            var location = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
+            if(File.Exists(location))
+                return location;
 
             return null;
+
         }
     }
 }

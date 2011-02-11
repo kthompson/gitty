@@ -222,7 +222,7 @@ namespace Gitty.Tests
             var id = "0f4a22329fb3970ca4c19d873623c68e937ba16c";
             var obj = git.OpenObject(id);
 
-            Assert.IsInstanceOf(typeof(Blob), obj);
+            Assert.IsInstanceOf(typeof (Blob), obj);
 
             var blob = obj as Blob;
             if (blob == null)
@@ -230,18 +230,13 @@ namespace Gitty.Tests
 
             Assert.AreEqual(id, blob.Id);
 
-            
-            
-            blob.GetContentStream((stream, loader) => {
-                Assert.AreEqual(47, loader.Size);
-                Assert.AreEqual(ObjectType.Blob, loader.Type);                          
+            Assert.AreEqual(47, blob.Size);
+            Assert.AreEqual(ObjectType.Blob, blob.Type);
 
-                var actual = TestHelper.ReadToEndOfStream(stream);
-                var expected = TestHelper.GetObjectAsString("blob", id);
+            var actual = TestHelper.ReadToEndOfStream(new MemoryStream(blob.Data));
+            var expected = TestHelper.GetObjectAsString("blob", id);
 
-                Assert.AreEqual(expected, actual);
-
-            });
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
