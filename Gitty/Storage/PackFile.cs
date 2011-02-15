@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Gitty.Storage
 {
@@ -71,17 +69,6 @@ namespace Gitty.Storage
                 this._index = new PackIndex(this.IndexLocation, this._entryCount);
             }
             this._loaded = true;
-        }
-
-        internal static IEnumerable<PackFile> FindAll(Repository repository)
-        {
-            var packs = new DirectoryInfo(repository.PacksLocation);
-            if(packs.Exists)
-                return packs
-                    .EnumerateFiles("*.pack")
-                    .Select(pf => new PackFile(pf.FullName));
-
-            return new PackFile[] {};
         }
 
         public bool HasEntry(string id)

@@ -27,13 +27,13 @@ namespace Gitty
         public string RelativePath { get; private set; }
         public string Location { get; private set; }
 
-        public Ref(string repositoryLocation, string location, string id = null)
+        public Ref(string refsLocation, string location, string id = null)
         {
             this.Location = location;
             this.IsPacked = id != null;
             this.Id = id;
 
-            var relPath = Helper.MakeRelativePath(Path.Combine(repositoryLocation, Refs), location).Replace('\\', '/');
+            var relPath = Helper.MakeRelativePath(refsLocation, location).Replace('\\', '/');
 
             if (relPath.StartsWith(Tags))
             {

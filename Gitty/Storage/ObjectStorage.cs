@@ -8,15 +8,26 @@ namespace Gitty.Storage
 {
     class ObjectStorage
     {
-        public Repository Repository { get; private set; }
-        public string Location { get; private set; }
+        public string ObjectsLocation { get; private set; }
         public string PacksLocation { get; private set; }
+        public string InfoLocation { get; private set; }
 
 
-        public ObjectStorage(string objectsLocation)
+        public ObjectStorage(string gitLocation, bool create)
         {
-            this.Location = objectsLocation;
-            this.PacksLocation = Path.Combine(objectsLocation, "pack");
+            this.ObjectsLocation = Path.Combine(gitLocation, "objects");
+            this.PacksLocation = Path.Combine(this.ObjectsLocation, "pack");
+            this.InfoLocation = Path.Combine(this.ObjectsLocation, "info");
+
+            if (!create) 
+                return;
+
+            //.git/objects
+            Directory.CreateDirectory(this.ObjectsLocation);
+            //.git/objects/pack
+            Directory.CreateDirectory(this.PacksLocation);
+            //.git/objects/info
+            Directory.CreateDirectory(this.InfoLocation);
         }
 
         public IEnumerable<PackFile> PackFiles
@@ -108,8 +119,7 @@ namespace Gitty.Storage
 
         private ObjectReader CreateReader(string id)
         {
-            //TODO: need to get rid of repository and just use ObjectsLocation
-            var loader = LooseObjectReader.GetObjectLoader(this.Location, id);
+            var loader = LooseObjectReader.GetObjectLoader(this.ObjectsLocation, id);
             if (loader != null)
                 return loader;
 
@@ -150,7 +160,7 @@ namespace Gitty.Storage
 
         private bool LooseObjectExists(string id)
         {
-            var location = Path.Combine(this.Location, id.Substring(0, 2), id.Substring(2));
+            var location = Path.Combine(this.ObjectsLocation, id.Substring(0, 2), id.Substring(2));
             return File.Exists(location);
         }
         #endregion

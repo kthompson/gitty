@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Gitty.Storage;
 
@@ -33,17 +32,14 @@ namespace Gitty
 
             this.HooksLocation = Path.Combine(this.Location, "hooks");
 
-            this.ObjectsLocation = Path.Combine(this.Location, "objects");
-            this.PacksLocation = Path.Combine(this.ObjectsLocation, "pack");
+            this.CreateGitDirectory(create);
 
-            this.RefsLocation = Path.Combine(this.Location, Ref.Refs);
+            this._objectStorage = new ObjectStorage(this.Location, create);
+            this._refStorage = new RefStorage(this.Location, create);
+        }
 
-            this.HeadsLocation = Path.Combine(this.RefsLocation, Ref.Heads);
-            this.RemotesLocation = Path.Combine(this.RefsLocation, Ref.Remotes);
-            this.TagsLocation = Path.Combine(this.RefsLocation, Ref.Tags);
-
-            this._storage = new ObjectStorage(this.ObjectsLocation);
-
+        private void CreateGitDirectory(bool create)
+        {
             if (!create) 
                 return;
 
@@ -73,18 +69,6 @@ namespace Gitty
             Directory.CreateDirectory(this.InfoLocation);
             EmbeddedToFile("Gitty.Content.info.exclude", Path.Combine(this.InfoLocation, "exclude"));
 
-            //.git/objects
-            Directory.CreateDirectory(this.ObjectsLocation);
-            //.git/objects/info
-            Directory.CreateDirectory(Path.Combine(this.ObjectsLocation, "info"));
-            //.git/objects/pack
-            Directory.CreateDirectory(this.PacksLocation);
-            //.git/refs
-            Directory.CreateDirectory(this.RefsLocation);
-            //.git/refs/heads
-            Directory.CreateDirectory(this.HeadsLocation);
-            //.git/refs/tags
-            Directory.CreateDirectory(this.TagsLocation);
         }
 
         private void EmbeddedHookToFile(string file)
@@ -108,32 +92,27 @@ namespace Gitty
 
         public IEnumerable<Ref> Remotes
         {
-            get { return RefsFromPath(this.RemotesLocation); }
+            get { return this._refStorage.Remotes; }
         }
 
         public IEnumerable<Ref> Refs
         {
-            get { return RefsFromPath(this.RefsLocation); }
+            get { return this._refStorage.Refs; }
         }
 
         public IEnumerable<Ref> Heads
         {
-            get { return RefsFromPath(this.HeadsLocation); }
+            get { return this._refStorage.Heads; }
         }
 
         public IEnumerable<Ref> Branches
         {
-            get { return RefsFromPath(this.HeadsLocation); }
+            get { return this._refStorage.Branches; }
         }
 
         public IEnumerable<Ref> Tags
         {
-            get { return RefsFromPath(this.TagsLocation); }
-        }
-
-        private IEnumerable<Ref> RefsFromPath(string location)
-        {
-            return Helper.GetLocations(location).Select(path => new Ref(this.Location, path));
+            get { return this._refStorage.Tags; }
         }
 
         public bool IsBare
@@ -142,16 +121,12 @@ namespace Gitty
         }
 
         public string Location { get; private set; }
-        public string RefsLocation { get; private set; }
-        public string HeadsLocation { get; private set; }
-        public string RemotesLocation { get; private set; }
-        public string TagsLocation { get; private set; }
-        public string PacksLocation { get; private set; }
-        public string ObjectsLocation { get; private set; }
+        
         public string HooksLocation { get; private set; }
         public string InfoLocation { get; private set; }
 
-        private ObjectStorage _storage;
+        private readonly ObjectStorage _objectStorage;
+        private readonly RefStorage _refStorage;
 
         public Head Head
         {
@@ -214,57 +189,10 @@ namespace Gitty
             }
         }
 
-        //public object OpenObject(string id)
-        //{
-        //    var loader = OpenObjectLoader(id);
-        //    if (loader == null)
-        //        return null;
-
-        //    switch (loader.Type)
-        //    {
-        //        case ObjectType.Commit:
-        //            return new Commit(this, loader, id);
-        //        case ObjectType.Tree:
-        //            return new Tree(id, 0, null);
-        //        case ObjectType.Blob:
-        //            //TODO: fix this
-        //            return new Blob(id, 0, null);
-        //        case ObjectType.Tag:
-        //            return new Tag(this, loader, id);
-        //        case ObjectType.OffsetDelta:
-        //        case ObjectType.ReferenceDelta:
-        //        default:
-        //            throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
-        //    }
-        //}
-
-        
-
-        //public TreeEntry<T> OpenTreeEntry<T>(string id, string name, string mode, Tree parent)
-        //    where T : AbstractObject
-        //{
-        //    var loader = OpenObjectLoader(id);
-        //    if (loader == null)
-        //        return null;
-
-        //    switch (loader.Type)
-        //    {
-        //        case ObjectType.Tree:
-        //            return new Tree(this, id, name, mode, parent);
-        //        case ObjectType.Blob:
-        //            return new Blob(id, name, mode, parent);
-        //        case ObjectType.Commit:
-        //        case ObjectType.Tag:
-        //        case ObjectType.OffsetDelta:
-        //        case ObjectType.ReferenceDelta:
-        //        default:
-        //            throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", loader.Type, id));
-        //    }
-        //}
-
+        //TODO: we should remove this as we should only have access through other fields
         public AbstractObject OpenObject(string id)
         {
-            return this._storage.Read(id);
+            return this._objectStorage.Read(id);
         }
     }
 }
