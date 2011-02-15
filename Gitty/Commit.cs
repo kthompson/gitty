@@ -5,7 +5,7 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Commit
+    public class Commit : AbstractObject
     {
         private readonly ObjectStorage _storage;
         private readonly ObjectReader _reader;
@@ -60,14 +60,12 @@ namespace Gitty
             }
         }
 
-        public string Id { get; private set; }
-
         internal Commit(ObjectStorage storage, ObjectReader reader, string id)
+            : base(ObjectType.Commit, id)
         {
             _storage = storage;
             _reader = reader;
 
-            this.Id = id;
             this._parents = new List<Commit>();
         }
 

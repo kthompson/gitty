@@ -13,11 +13,10 @@ namespace Gitty.Storage
         public string PacksLocation { get; private set; }
 
 
-        public ObjectStorage(Repository repository)
+        public ObjectStorage(string objectsLocation)
         {
-            this.Repository = repository;
-            this.Location = repository.ObjectsLocation;
-            this.PacksLocation = repository.PacksLocation;
+            this.Location = objectsLocation;
+            this.PacksLocation = Path.Combine(objectsLocation, "pack");
         }
 
         public IEnumerable<PackFile> PackFiles
@@ -37,21 +36,21 @@ namespace Gitty.Storage
 
         #region readers
 
-        public T Read<T>(string id)
+        public T Read<T>(string id, Tree parent = null, string name = null, string mode = null)
             where T : class
         {
-            return Read(id) as T;
+            return Read(id, parent, name, mode) as T;
         }
 
-        public AbstractObject Read(string id)
+        public AbstractObject Read(string id, Tree parent = null, string name = null, string mode = null)
         {
             ObjectType type;
-            return Read(id, out type);
+            return Read(id, out type, parent, name, mode);
         }
 
-        public AbstractObject Read(string id, out ObjectType type)
+        public AbstractObject Read(string id, out ObjectType type, Tree parent = null, string name = null, string mode = null)
         {
-            var reader = ObjectReader.Create(this.Repository, id);
+            var reader = CreateReader(id);
             if (reader == null)
             {
                 type = ObjectType.Undefined;
@@ -63,11 +62,13 @@ namespace Gitty.Storage
             switch (reader.Type)
             {
                 case ObjectType.Tree:
-                    return CreateTree(id, reader);
+                    return CreateTree(id, reader, parent, name, mode);
                 case ObjectType.Blob:
-                    return CreateBlob(id, reader);
+                    return CreateBlob(id, reader, parent, name, mode);
                 case ObjectType.Commit:
+                    return CreateCommit(id, reader);
                 case ObjectType.Tag:
+                    return CreateTag(id, reader);
                 case ObjectType.OffsetDelta:
                 case ObjectType.ReferenceDelta:
                 default:
@@ -75,17 +76,27 @@ namespace Gitty.Storage
             }
         }
 
-        private Tree CreateTree(string id, ObjectReader reader)
+        private Tag CreateTag(string id, ObjectReader reader)
         {
-            return new Tree(this, id, reader.Size, LoadDataFromReader(reader));
+            return new Tag(this, reader, id);
         }
 
-        private Blob CreateBlob(string id, ObjectReader reader)
+        private Commit CreateCommit(string id, ObjectReader reader)
         {
-            return new Blob(id, reader.Size, LoadDataFromReader(reader));
+            return new Commit(this, reader, id);
         }
 
-        private Func<byte[]> LoadDataFromReader(ObjectReader reader)
+        private Tree CreateTree(string id, ObjectReader reader, Tree parent = null, string name = null, string mode = null)
+        {
+            return new Tree(this, id, reader.Size, LoadDataFromReader(reader), parent, name, mode);
+        }
+
+        private static Blob CreateBlob(string id, ObjectReader reader, Tree parent = null, string name = null, string mode = null)
+        {
+            return new Blob(id, reader.Size, LoadDataFromReader(reader), parent, name, mode);
+        }
+
+        private static Func<byte[]> LoadDataFromReader(ObjectReader reader)
         {
             return () =>
                        {
@@ -93,6 +104,20 @@ namespace Gitty.Storage
                            reader.Load(stream => stream.Read(bytes, 0, bytes.Length));
                            return bytes;
                        };
+        }
+
+        private ObjectReader CreateReader(string id)
+        {
+            //TODO: need to get rid of repository and just use ObjectsLocation
+            var loader = LooseObjectReader.GetObjectLoader(this.Location, id);
+            if (loader != null)
+                return loader;
+
+            var pf = this.PackFiles.Where(pack => pack.HasEntry(id)).FirstOrDefault();
+            if (pf != null)
+                return pf.GetObjectLoader(id);
+
+            return null;
         }
 
         #endregion

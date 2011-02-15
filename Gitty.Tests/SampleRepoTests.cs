@@ -189,7 +189,7 @@ namespace Gitty.Tests
         public void RepositoryCanOpenObjectTag()
         {
             var git = Git.Open(null, TestHelper.SampleRepoGit);
-            var id = "56ffce8543f0840854ce9ca6f6fa55719e15e0d6";
+            const string id = "56ffce8543f0840854ce9ca6f6fa55719e15e0d6";
             var obj = git.OpenObject(id);
 
             Assert.IsInstanceOf(typeof(Tag), obj);
@@ -200,7 +200,7 @@ namespace Gitty.Tests
 
             Assert.AreEqual(id, tag.Id);
 
-            Assert.AreEqual("commit", tag.Type);
+            Assert.AreEqual("commit", tag.ObjectType);
             Assert.IsInstanceOf(typeof(Commit), tag.Object);
 
             var commit = tag.Object as Commit;

@@ -20,19 +20,6 @@ namespace Gitty.Storage
 
         public abstract void Load(ContentLoader contentLoader = null);
 
-        public static ObjectReader Create(Repository repository, string id)
-        {
-            var loader = LooseObjectReader.GetObjectLoader(repository.ObjectsLocation, id);
-            if (loader != null)
-                return loader;
-
-            //TODO: we should be caching the pack files and using FileSystemWatcher or something for updates
-            var pf = PackFile.FindAll(repository).Where(pack => pack.HasEntry(id)).FirstOrDefault();
-            if (pf != null)
-                return pf.GetObjectLoader(id);
-
-            return null;
-        }
 
         public static ContentLoader CompressedContentLoader(ContentLoader loader)
         {

@@ -7,13 +7,13 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Tree : AbstractObject
+    public class Tree : TreeEntry
     {
         private readonly ObjectStorage _storage;
         public long Size { get; private set; }
 
-        internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader)
-            : base(ObjectType.Tree, id)
+        internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
+            : base(ObjectType.Tree, id, parent, name, mode)
         {
             this.Size = size;
             this._storage = storage;
@@ -26,42 +26,42 @@ namespace Gitty
             get { return _loader.Value; }
         }
 
-        private readonly List<ITreeEntry<AbstractObject>> _items = new List<ITreeEntry<AbstractObject>>();
-        //public virtual IEnumerable<TreeEntry<AbstractObject>> Items
-        //{
-        //    get
-        //    {
-        //        this.EnsureLoaded();
-        //        return _items.AsReadOnly();
-        //    }
-        //}
+        private readonly List<TreeEntry> _items = new List<TreeEntry>();
+        public virtual IEnumerable<TreeEntry> Items
+        {
+            get
+            {
+                this.EnsureLoaded();
+                return _items.AsReadOnly();
+            }
+        }
 
-        //private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T,bool> filter, Func<T, IEnumerable<T>> selector)
-        //{
-        //    foreach (var entry in entries)
-        //    {
-        //        if (filter(entry))
-        //        {
-        //            yield return entry;
-        //        }
-        //        else
-        //        {
-        //            foreach (var subentry in FlattenTree(selector(entry), filter, selector))
-        //            {
-        //                yield return subentry;
-        //            }
-        //        }
-        //    }
-        //}
+        private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T, bool> filter, Func<T, IEnumerable<T>> selector)
+        {
+            foreach (var entry in entries)
+            {
+                if (filter(entry))
+                {
+                    yield return entry;
+                }
+                else
+                {
+                    foreach (var subentry in FlattenTree(selector(entry), filter, selector))
+                    {
+                        yield return subentry;
+                    }
+                }
+            }
+        }
 
-        //public IEnumerable<TreeEntry<AbstractObject>> EnumerateItems(bool recursive = false)
-        //{
-        //    if (!recursive)
-        //        return this.Items;
+        public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
+        {
+            if (!recursive)
+                return this.Items;
 
-        //    return FlattenTree(this.Items, blob => blob.Type == ObjectType.Blob,
-        //                                   tree => ((Tree)tree.Entry).EnumerateItems(recursive));
-        //}
+            return FlattenTree(this.Items, blob => blob.Type == ObjectType.Blob,
+                                           tree => ((Tree)tree).EnumerateItems(recursive));
+        }
 
         private bool _loaded;
 
@@ -83,9 +83,9 @@ namespace Gitty
                 bytesRead += name.Length + 1;
                 var entryId = stream.ReadId();
                 bytesRead += 20;
-                var entry = _storage.Read(entryId);
-                if (entry is Tree)
-                    this._items.Add(new TreeEntry<Tree>((Tree) entry, name, mode, this));
+                var entry = _storage.Read<TreeEntry>(entryId, this, name, mode);
+
+                this._items.Add(entry);
             }
 
             this._loaded = true;

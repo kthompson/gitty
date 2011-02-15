@@ -6,12 +6,12 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Blob : AbstractObject
+    public class Blob : TreeEntry
     {
         public long Size { get; private set; }
 
-        internal Blob(string id, long size, Func<byte[]> loader) 
-            : base(ObjectType.Blob, id)
+        internal Blob(string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
+            : base(ObjectType.Blob, id, parent, name, mode)
         {
             _loader = new Lazy<byte[]>(loader);
             this.Size = size;

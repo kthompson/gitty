@@ -42,6 +42,8 @@ namespace Gitty
             this.RemotesLocation = Path.Combine(this.RefsLocation, Ref.Remotes);
             this.TagsLocation = Path.Combine(this.RefsLocation, Ref.Tags);
 
+            this._storage = new ObjectStorage(this.ObjectsLocation);
+
             if (!create) 
                 return;
 
@@ -260,9 +262,9 @@ namespace Gitty
         //    }
         //}
 
-        internal ObjectReader OpenObjectLoader(string id)
+        public AbstractObject OpenObject(string id)
         {
-            return ObjectReader.Create(this, id);
+            return this._storage.Read(id);
         }
     }
 }

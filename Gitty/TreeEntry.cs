@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics.Contracts;
 using Gitty.Storage;
 
 namespace Gitty
 {
-    public class TreeEntry<T> : AbstractObject, ITreeEntry<T>
-        where T : AbstractObject
+    public class TreeEntry : AbstractObject
     {
         public string Mode { get; private set; }
 
         public Tree Parent { get; private set; }
 
-        public T Entry { get; set; }
         public string Name { get; private set; }
 
         private string _fullName;
@@ -41,24 +41,12 @@ namespace Gitty
             }
         }
 
-        internal TreeEntry(T entry, string name, string mode, Tree parent) 
-            : base(entry.Type, entry.Id)
+        internal TreeEntry(ObjectType type, string id, Tree parent, string name, string mode) 
+            : base(type, id)
         {
-            this.Entry = entry;
+            this.Parent = parent;
             this.Name = name;
             this.Mode = mode;
-            this.Parent = parent;
         }
-    }
-
-    public interface ITreeEntry<out T>
-    {
-        Tree Parent { get; }
-        string Mode { get; }
-        string Name { get; }
-
-        T Entry { get; }
-
-        string FullName { get; }
     }
 }

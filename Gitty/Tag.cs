@@ -4,19 +4,17 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class Tag
+    public class Tag : AbstractObject
     {
         private readonly ObjectStorage _storage;
         private readonly Action _loader;
 
         internal Tag(ObjectStorage storage, ObjectReader reader, string id)
+            : base(Gitty.ObjectType.Tag, id)
         {
             _storage = storage;
             _loader = () => LoadFromObjectReader(reader);
-            this.Id = id;
         }
-
-        public string Id { get; private set; }
 
         private string _name;
         public string Name
@@ -29,7 +27,7 @@ namespace Gitty
         }
 
         private string _type;
-        public string Type
+        public string ObjectType
         {
             get
             {
