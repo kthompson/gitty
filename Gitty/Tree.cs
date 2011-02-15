@@ -36,22 +36,28 @@ namespace Gitty
             }
         }
 
-        private static IEnumerable<T> FlattenTree<T>(IEnumerable<T> entries, Func<T, bool> filter, Func<T, IEnumerable<T>> selector)
+        private static IEnumerable<TreeEntry> RecursiveTreeEnumerator(Tree tree)
         {
-            foreach (var entry in entries)
+            var stack = new Stack<IEnumerator<TreeEntry>>();
+            stack.Push(tree.Items.GetEnumerator());
+
+            do
             {
-                if (filter(entry))
+                var enumerator = stack.Pop();
+                while (enumerator.MoveNext())
                 {
-                    yield return entry;
-                }
-                else
-                {
-                    foreach (var subentry in FlattenTree(selector(entry), filter, selector))
+                    if (enumerator.Current.Type == ObjectType.Tree)
                     {
-                        yield return subentry;
+                        stack.Push(enumerator);
+                        enumerator = ((Tree) enumerator.Current).Items.GetEnumerator();
+                    }
+                    else
+                    {
+                        yield return enumerator.Current;
                     }
                 }
-            }
+                
+            } while (stack.Count > 0);
         }
 
         public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
@@ -59,8 +65,7 @@ namespace Gitty
             if (!recursive)
                 return this.Items;
 
-            return FlattenTree(this.Items, blob => blob.Type == ObjectType.Blob,
-                                           tree => ((Tree)tree).EnumerateItems(recursive));
+            return RecursiveTreeEnumerator(this);
         }
 
         private bool _loaded;
