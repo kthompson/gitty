@@ -96,13 +96,11 @@ namespace Gitty.Tests
         }
 
         [Test]
-        public void EnumerateTreeItemsRecursive()
+        public void EnumerateTreeItemsRecursive([ValueSource("Trees")]string treeId)
         {
            using (TestHelper.WorkingTree())
            {
-                var treeId = "49055ddb2bad8335a11de37721de51419c455e2f";
-
-                var result = TestHelper.Git.LsTree("-r", "--name-only", treeId);
+               var result = TestHelper.Git.LsTree("-r", "--name-only", treeId);
 
                 var git = Git.Open(TestHelper.WorkingDirectory);
                 Assert.NotNull(git);
@@ -123,6 +121,27 @@ namespace Gitty.Tests
                         var name = entry.Name;
                         var fullName = entry.FullName;
                         Assert.AreEqual(line, fullName);
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<string> Trees()
+        {
+            using (TestHelper.WorkingTree())
+            {
+                var result = TestHelper.Git.RevList("HEAD");
+                var trees = new List<string>();
+
+                using (var reader = new StringReader(result))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        var commit = TestHelper.Git.CatFile("commit", line);
+                        var lines = commit.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                        var tree = lines[0].Substring(5);
+                        yield return tree;
                     }
                 }
             }
