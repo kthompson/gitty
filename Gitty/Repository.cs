@@ -34,7 +34,7 @@ namespace Gitty
 
             this.CreateGitDirectory(create);
 
-            this._objectStorage = new ObjectStorage(this.Location, create);
+            this.ObjectStorage = new ObjectStorage(this.Location, create);
             this._refStorage = new RefStorage(this.Location, create);
         }
 
@@ -125,7 +125,8 @@ namespace Gitty
         public string HooksLocation { get; private set; }
         public string InfoLocation { get; private set; }
 
-        private readonly ObjectStorage _objectStorage;
+        internal ObjectStorage ObjectStorage { get; private set; }
+
         private readonly RefStorage _refStorage;
 
         public Head Head
@@ -192,7 +193,7 @@ namespace Gitty
         //TODO: we should remove this as we should only have access through other fields
         public AbstractObject OpenObject(string id)
         {
-            return this._objectStorage.Read(id);
+            return this.ObjectStorage.Read(id);
         }
     }
 }

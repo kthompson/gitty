@@ -36,6 +36,12 @@ namespace Gitty
             }
         }
 
+        private Tree _tree;
+        public Tree Tree
+        {
+            get { return _tree ?? (_tree = this.Repository.ObjectStorage.Read<Tree>(this.Id)); }
+        }
+
         public Head(Repository repository)
         {
             this.Repository = repository;
