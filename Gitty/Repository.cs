@@ -8,13 +8,13 @@ namespace Gitty
 {
     public class Repository
     {
-        public string WorkingDirectory { get; private set; }
+        public string WorkingDirectoryLocation { get; private set; }
 
         internal Repository(string workingDirectory = null, string gitDirectory = null, bool create = false)
         {
             if (workingDirectory != null)
             {
-                this.WorkingDirectory = Helper.MakeAbsolutePath(workingDirectory);
+                this.WorkingDirectoryLocation = Helper.MakeAbsolutePath(workingDirectory);
 
                 gitDirectory = gitDirectory ?? Path.Combine(workingDirectory, ".git");
             }
@@ -44,7 +44,7 @@ namespace Gitty
                 return;
 
             //.git
-            var configfile = this.WorkingDirectory == null
+            var configfile = this.WorkingDirectoryLocation == null
                                  ? "Gitty.Content.config_bare"
                                  : "Gitty.Content.config";
 
@@ -117,7 +117,7 @@ namespace Gitty
 
         public bool IsBare
         {
-            get { return this.WorkingDirectory == null; }
+            get { return this.WorkingDirectoryLocation == null; }
         }
 
         public string Location { get; private set; }
@@ -153,28 +153,28 @@ namespace Gitty
                 if(this.IsBare)
                     return RepositoryState.Bare;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, ".dotest")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, ".dotest")))
                     return RepositoryState.Rebasing;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, ".dotest-merge")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, ".dotest-merge")))
                     return RepositoryState.RebasingInteractive;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply", "rebasing")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "rebase-apply", "rebasing")))
                     return RepositoryState.RebasingRebasing;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply", "applying")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "rebase-apply", "applying")))
                     return RepositoryState.Apply;
 
-                if (Directory.Exists(Path.Combine(this.WorkingDirectory, "rebase-apply")))
+                if (Directory.Exists(Path.Combine(this.WorkingDirectoryLocation, "rebase-apply")))
                     return RepositoryState.Rebasing;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, "rebase-merge", "interactive")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "rebase-merge", "interactive")))
                     return RepositoryState.RebasingInteractive;
 
-                if (Directory.Exists(Path.Combine(this.WorkingDirectory, "rebase-merge")))
+                if (Directory.Exists(Path.Combine(this.WorkingDirectoryLocation, "rebase-merge")))
                     return RepositoryState.RebasingMerge;
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, "MERGE_HEAD")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "MERGE_HEAD")))
                 {
                     if(this.Index.HasUnmergedPaths)
                         return RepositoryState.Merging;
@@ -182,7 +182,7 @@ namespace Gitty
                     return RepositoryState.MergingResolved;
                 }
 
-                if (File.Exists(Path.Combine(this.WorkingDirectory, "BISECT_LOG")))
+                if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "BISECT_LOG")))
                     return RepositoryState.Bisecting;
 
                 return RepositoryState.Safe;
