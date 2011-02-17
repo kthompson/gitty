@@ -39,5 +39,26 @@ namespace Gitty.Tests
             var version = index.EntryCount;
         }
 
+        [Test]
+        public void IndexedFilesMatchIndexCount()
+        {
+            using (Test.WorkingTree())
+            {
+                var result = Test.Git.LsFiles();
+
+                var git = Git.Open(Test.WorkingDirectory);
+                Assert.NotNull(git);
+                var index = git.Index;
+                
+                using (var reader = new StringReader(result))
+                {
+                    foreach (var entry in index.Entries)
+                    {
+                        var line = reader.ReadLine();
+                        Assert.AreEqual(line, entry.Name);
+                    }
+                }
+            }
+        }
     }
 }
