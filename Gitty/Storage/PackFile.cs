@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace Gitty.Storage
 {
@@ -73,7 +74,7 @@ namespace Gitty.Storage
 
         public bool HasEntry(string id)
         {
-            return this.Index.GetEntry(id) != null;
+            return this.Index.HasEntry(id);
         }
 
         public PackedObjectReader GetObjectLoader(string id)
