@@ -96,19 +96,4 @@ namespace Gitty
             this._loaded = true;
         }
     }
-
-    class WorkingTreeHelper
-    {
-
-        public static bool NotIgnored(Repository repo, FileSystemInfo info)
-        {
-            //TODO: add support for .gitignore
-            return true;
-        }
-
-        public static string ModeForFileSystemInfo(FileSystemInfo info)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

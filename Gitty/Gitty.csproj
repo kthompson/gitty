@@ -102,6 +102,7 @@
     <Compile Include="Tree.cs" />
     <Compile Include="TreeEntry.cs" />
     <Compile Include="Storage\WholePackedObjectReader.cs" />
+    <Compile Include="WorkingTree.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Content\config" />
