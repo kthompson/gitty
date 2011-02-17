@@ -14,7 +14,7 @@ namespace Gitty.Tests
     {
         private static readonly string MSysGitPath = Environment.GetEnvironmentVariable("MSYSGIT_PATH");
 
-        private static void Exec(IEnumerable<string> arguments, out object result)
+        private static void Exec(IEnumerable<string> arguments, out string result, out string error)
         {
             if (MSysGitPath == null)
                 throw new InvalidOperationException("MSYSGIT_PATH was not specified. Please make sure to set the MSYSGIT_PATH environment variable to the bin directory of your MSysGit install.");
@@ -26,6 +26,7 @@ namespace Gitty.Tests
             var start = new ProcessStartInfo(git, string.Join(" ", arguments))
                             {
                                 RedirectStandardOutput = true,
+                                RedirectStandardError = true,
                                 UseShellExecute = false, 
                                 WindowStyle =  ProcessWindowStyle.Hidden, 
                                 CreateNoWindow =  true,
@@ -37,22 +38,30 @@ namespace Gitty.Tests
 
             using (var proc = Process.Start(start))
             {
-                string[] output = {string.Empty};
+                var errorStringBuilder = new StringBuilder();
+                proc.ErrorDataReceived += (sender, args) => errorStringBuilder.AppendLine(args.Data);
 
-                proc.OutputDataReceived += (sender, args) => output[0] += args.Data + Environment.NewLine;
+                proc.BeginErrorReadLine();
 
-                proc.BeginOutputReadLine();
-                
+                result = proc.StandardOutput.ReadToEnd();
+
                 proc.WaitForExit();
-                result = output[0];
+                error = errorStringBuilder.ToString();
             }
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             result = null;
+            string output, error;
             var command = ToCommand(binder.Name);
-            Exec(new[] {command}.Concat(args.Select(a => a.ToString())), out result);
+            var arguments = new[] {command}.Concat(args.Select(a => a.ToString())).ToArray();
+            Exec(arguments, out output, out error);
+            result = output;
+            
+            if (!string.IsNullOrWhiteSpace(error) && Debugger.IsAttached)
+                Debugger.Break();
+
             return true;
         }
 
