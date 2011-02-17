@@ -15,7 +15,21 @@ namespace Gitty.Tests
         public static readonly string SampleRepo = Path.Combine(ArtifactsPath, "sample_repo");
         public static readonly string SampleRepoGit = Path.Combine(ArtifactsPath, "sample_repo.git");
 
-        public static readonly string WorkingDirectory = new DirectoryInfo(Path.Combine("..", "..", "..")).FullName;
+        public static readonly string WorkingDirectory;
+
+        static Test()
+        {
+            var gittyRoot = Environment.GetEnvironmentVariable("GITTY_ROOT");
+            if(gittyRoot == null)
+                throw new InvalidOperationException("GITTY_ROOT was not specified. Please make sure to set the GITTY_ROOT environment variable to the root of your Gitty checkout directory.");
+
+            WorkingDirectory  = new DirectoryInfo(gittyRoot).FullName;
+
+            ArtifactsPath = Path.Combine(WorkingDirectory, "Gitty.Tests", "Artifacts");
+            ObjectsPath = Path.Combine(ArtifactsPath, "objects");
+            SampleRepo = Path.Combine(ArtifactsPath, "sample_repo");
+            SampleRepoGit = Path.Combine(ArtifactsPath, "sample_repo.git");
+        }
 
         public static string GetObjectAsString(string type, string id)
         {
