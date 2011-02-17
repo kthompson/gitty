@@ -8,12 +8,13 @@ namespace Gitty.Storage
     public abstract class ObjectReader : IObjectInfo
     {
         public virtual ObjectType Type { get; protected set; }
-        public long Size { get; protected  set; }
+        public virtual long Size { get; protected set; }
 
         public delegate void ContentLoader(Stream stream);
 
         protected ObjectReader(ObjectType type, long size)
         {
+            //TODO: this is bad for business
             this.Type = type;
             this.Size = size;
         }
