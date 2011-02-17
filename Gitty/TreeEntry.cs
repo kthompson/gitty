@@ -6,7 +6,7 @@ using Gitty.Storage;
 
 namespace Gitty
 {
-    public class TreeEntry : AbstractObject
+    public abstract class TreeEntry : AbstractObject
     {
         public string Mode { get; private set; }
 
@@ -41,8 +41,8 @@ namespace Gitty
             }
         }
 
-        internal TreeEntry(ObjectType type, string id, Tree parent, string name, string mode) 
-            : base(type, id)
+        internal TreeEntry(string id, Tree parent, string name, string mode) 
+            : base(id)
         {
             this.Parent = parent;
             this.Name = name;

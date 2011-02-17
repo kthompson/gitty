@@ -60,5 +60,30 @@ namespace Gitty.Tests
                 }
             }
         }
+
+        [Test]
+        public void GetWorkingDirectory()
+        {
+            using (Test.WorkingTree())
+            {
+                var result = Test.Git.LsFiles("-s");
+
+                var git = Git.Open(Test.WorkingDirectory);
+                Assert.NotNull(git);
+                var index = git.Status.WorkingTree;
+
+                using (var reader = new StringReader(result))
+                {
+                    foreach (var entry in index.EnumerateItems(true))
+                    {
+                        var line = reader.ReadLine();
+                        var id = entry.Id;
+                        if (line == id)
+                        {
+                        }
+                    }
+                }
+            }
+        }
     }
 }

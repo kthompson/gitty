@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Gitty.Storage;
 
@@ -20,6 +21,7 @@ namespace Gitty
             : base(null, null, 0, null, parent, name, mode)
         {
             this.Directory = directory;
+            
         }
 
         public override IEnumerable<TreeEntry> Items
@@ -44,7 +46,7 @@ namespace Gitty
         private static string ModeFromFileSystemInfo(FileSystemInfo info)
         {
             //TODO implement Mode From FileSystemInfo
-            return string.Empty;
+            return "10644";
         }
 
         public static bool NotIgnored(Repository repo, FileSystemInfo info)
@@ -59,9 +61,20 @@ namespace Gitty
         public FileInfo File { get; private set; }
 
         internal WorkingTreeFile(FileInfo file, Tree parent, string name, string mode)
-            : base(null, 0, null, parent, name, mode)
+            : base(null, file.Length, () => LoadToByteBuffer(file), parent, name, mode)
         {
             this.File = file;
+        }
+
+        private static byte[] LoadToByteBuffer(FileInfo file)
+        {
+            var buffer = new byte[file.Length];
+            using(var stream = file.OpenRead())
+            {
+                stream.Read(buffer, 0, buffer.Length);
+            }
+
+            return buffer;
         }
     }
 }

@@ -13,11 +13,25 @@ namespace Gitty
         public long Size { get; private set; }
 
         internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
-            : base(ObjectType.Tree, id, parent, name, mode)
+            : base(id, parent, name, mode)
         {
             this.Size = size;
             this._storage = storage;
-            this._loader = new Lazy<byte[]>(loader);
+            this._loader = loader.Try(n => new Lazy<byte[]>(loader));
+        }
+
+        public override ObjectType Type
+        {
+            get
+            {
+                return ObjectType.Tree;
+            }
+        }
+
+        private string _id;
+        public override string Id
+        {
+            get { return base.Id ?? _id ?? (_id = ObjectWriter.ComputeId(this)); }
         }
 
         private readonly Lazy<byte[]> _loader;

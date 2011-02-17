@@ -157,12 +157,6 @@ namespace Gitty.Storage
 
         #region helper methods
 
-
-        private bool LooseObjectExists(string id)
-        {
-            var location = Path.Combine(this.ObjectsLocation, id.Substring(0, 2), id.Substring(2));
-            return File.Exists(location);
-        }
         #endregion
 
     }

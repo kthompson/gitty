@@ -14,7 +14,6 @@ namespace Gitty.Storage
 
         protected ObjectReader(ObjectType type, long size)
         {
-            //TODO: this is bad for business
             this.Type = type;
             this.Size = size;
         }

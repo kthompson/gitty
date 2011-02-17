@@ -61,7 +61,7 @@ namespace Gitty
         }
 
         internal Commit(ObjectStorage storage, ObjectReader reader, string id)
-            : base(ObjectType.Commit, id)
+            : base(id)
         {
             _storage = storage;
             _reader = reader;
@@ -112,6 +112,11 @@ namespace Gitty
                                   });
 
             this._loaded = true;
+        }
+
+        public override ObjectType Type
+        {
+            get { return ObjectType.Commit; }
         }
     }
 }

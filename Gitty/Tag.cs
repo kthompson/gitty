@@ -10,7 +10,7 @@ namespace Gitty
         private readonly Action _loader;
 
         internal Tag(ObjectStorage storage, ObjectReader reader, string id)
-            : base(Gitty.ObjectType.Tag, id)
+            : base(id)
         {
             _storage = storage;
             _loader = () => LoadFromObjectReader(reader);
@@ -113,6 +113,11 @@ namespace Gitty
             var buffer = new char[messageSize];
             var read = reader.Read(buffer, 0, buffer.Length);
             this._message = new string(buffer, 0, read);
+        }
+
+        public override ObjectType Type
+        {
+            get { return Gitty.ObjectType.Tag; }
         }
     }
 }

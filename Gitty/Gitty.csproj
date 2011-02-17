@@ -77,6 +77,7 @@
     <Compile Include="BinaryDelta.cs" />
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
+    <Compile Include="MessageDigest.cs" />
     <Compile Include="RefStorage.cs" />
     <Compile Include="Storage\DeltaPackedObjectReader.cs" />
     <Compile Include="Extensions.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Storage\ObjectReader.cs" />
     <Compile Include="ObjectType.cs" />
     <Compile Include="Storage\ObjectStorage.cs" />
+    <Compile Include="Storage\ObjectWriter.cs" />
     <Compile Include="Storage\PackedObjectReader.cs" />
     <Compile Include="Storage\PackFile.cs" />
     <Compile Include="Storage\PackIndex.cs" />

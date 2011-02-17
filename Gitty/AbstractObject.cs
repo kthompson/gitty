@@ -7,12 +7,11 @@ namespace Gitty
 {
     public abstract class AbstractObject
     {
-        public string Id { get; protected set; }
-        public ObjectType Type { get; protected set; }
+        public virtual string Id { get; protected set; }
+        public abstract ObjectType Type { get; }
 
-        protected AbstractObject(ObjectType type, string id = null)
+        protected AbstractObject(string id = null)
         {
-            this.Type = type;
             this.Id = id;
         }
     }
