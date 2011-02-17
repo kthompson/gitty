@@ -81,7 +81,7 @@
     <Compile Include="MSysGit.cs" />
     <Compile Include="ObjectTests.cs" />
     <Compile Include="PackTests.cs" />
-    <Compile Include="TestHelper.cs" />
+    <Compile Include="Test.cs" />
     <Compile Include="SampleRepoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

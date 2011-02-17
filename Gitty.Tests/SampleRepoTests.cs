@@ -14,7 +14,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHasRefs()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var refs = git.Refs.ToDictionary(r => r.Name, r => r);
 
             Assert.AreEqual(5, refs.Count);
@@ -45,7 +45,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHasHeads()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var refs = git.Heads.ToDictionary(r => r.Name, r => r);
 
             Assert.AreEqual(3, refs.Count);
@@ -63,7 +63,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHeadsAreBranches()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var heads = git.Heads.ToList();
             var branches = git.Branches.ToList();
             
@@ -78,7 +78,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHasRemotes()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var refs = git.Remotes.ToDictionary(r => r.Name, r => r);
 
             Assert.AreEqual(1, refs.Count);
@@ -91,7 +91,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHasTags()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var refs = git.Tags.ToDictionary(r => r.Name, r => r);
 
             Assert.AreEqual(1, refs.Count);
@@ -104,7 +104,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryHasHead()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var head = git.Head;
 
             Assert.AreEqual(false, head.IsDetached);
@@ -119,7 +119,7 @@ namespace Gitty.Tests
         [Test]
         public void LoadObjectWithLooseObjectLoader()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var head = git.Head;
 
             Assert.AreEqual(false, head.IsDetached);
@@ -140,7 +140,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryCanOpenObjectCommit()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var id = "f5f1da3d5aa6aa03479df730c64d5525e5d6d5d8";
             var obj = git.OpenObject(id);
 
@@ -164,7 +164,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryCanOpenObjectTree()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var id = "7ee9583cd8b390caac802ece6c144314ef5fc3bf";
             var obj = git.OpenObject(id);
 
@@ -188,7 +188,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryCanOpenObjectTag()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             const string id = "56ffce8543f0840854ce9ca6f6fa55719e15e0d6";
             var obj = git.OpenObject(id);
 
@@ -218,7 +218,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryCanOpenObjectBlob()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var id = "0f4a22329fb3970ca4c19d873623c68e937ba16c";
             var obj = git.OpenObject(id);
 
@@ -233,8 +233,8 @@ namespace Gitty.Tests
             Assert.AreEqual(47, blob.Size);
             Assert.AreEqual(ObjectType.Blob, blob.Type);
 
-            var actual = TestHelper.ReadToEndOfStream(new MemoryStream(blob.Data));
-            var expected = TestHelper.GetObjectAsString("blob", id);
+            var actual = Test.ReadToEndOfStream(new MemoryStream(blob.Data));
+            var expected = Test.GetObjectAsString("blob", id);
 
             Assert.AreEqual(expected, actual);
         }
@@ -242,7 +242,7 @@ namespace Gitty.Tests
         [Test]
         public void RepositoryOpenObjectReturnsNullForInvalidIds()
         {
-            var git = Git.Open(null, TestHelper.SampleRepoGit);
+            var git = Git.Open(null, Test.SampleRepoGit);
             var id = "abcdefghijklmnopqrstuvwxyz01234567890123";
             var obj = git.OpenObject(id);
 

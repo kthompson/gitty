@@ -18,21 +18,21 @@ namespace Gitty.Tests
             string git = null;
             try
             {
-                msysGit = TestHelper.GetTempFolder("msysgit");
-                TestHelper.Git.Init(msysGit);
+                msysGit = Test.Q(Test.GetTempFolder("msysgit"));
+                var result = Test.Git.Init(msysGit);
 
-                git = TestHelper.GetTempFolder("gitty");
+                git = Test.GetTempFolder("gitty");
                 Git.Init(git);
 
-                TestHelper.AssertFileSystemsSame(msysGit, git);
+                Test.AssertFileSystemsSame(msysGit, git);
             }
             finally
             {
                 if (msysGit != null) 
-                    TestHelper.DeleteRecursive(msysGit);
+                    Test.DeleteRecursive(msysGit);
 
                 if (git != null) 
-                    TestHelper.DeleteRecursive(git);
+                    Test.DeleteRecursive(git);
             }
         }
 
@@ -43,37 +43,34 @@ namespace Gitty.Tests
             string git = null;
             try
             {
-                msysGit = TestHelper.GetTempFolder("msysgit");
-                TestHelper.Git.Init("--bare", msysGit);
+                msysGit = Test.Q(Test.GetTempFolder("msysgit"));
+                Test.Git.Init("--bare", msysGit);
 
-                git = TestHelper.GetTempFolder("gitty");
+                git = Test.GetTempFolder("gitty");
                 Git.Init(git, true);
 
-                TestHelper.AssertFileSystemsSame(msysGit, git);
+                Test.AssertFileSystemsSame(msysGit, git);
             }
             finally
             {
                 if (msysGit != null)
-                    TestHelper.DeleteRecursive(msysGit);
+                    Test.DeleteRecursive(msysGit);
 
                 if (git != null)
-                    TestHelper.DeleteRecursive(git);
+                    Test.DeleteRecursive(git);
             }
         }
 
         [Test]
         public void EnumerateTreeItems()
         {
-            using (TestHelper.WorkingTree())
+            using (Test.WorkingTree())
             {
-                //Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingDirectory);
-                //Environment.SetEnvironmentVariable("GIT_DIR", Path.Combine(workingDirectory, ".git"));
-
                 var treeId = "49055ddb2bad8335a11de37721de51419c455e2f";
 
-                var result = TestHelper.Git.LsTree("--name-only", treeId);
+                var result = Test.Git.LsTree("--name-only", treeId);
 
-                var git = Git.Open(TestHelper.WorkingDirectory);
+                var git = Git.Open(Test.WorkingDirectory);
                 Assert.NotNull(git);
 
                 var o = git.OpenObject(treeId);
@@ -98,11 +95,11 @@ namespace Gitty.Tests
         [Test]
         public void EnumerateTreeItemsRecursive([ValueSource("Trees")]string treeId)
         {
-           using (TestHelper.WorkingTree())
+           using (Test.WorkingTree())
            {
-               var result = TestHelper.Git.LsTree("-r", "--name-only", treeId);
+               var result = Test.Git.LsTree("-r", "--name-only", treeId);
 
-                var git = Git.Open(TestHelper.WorkingDirectory);
+                var git = Git.Open(Test.WorkingDirectory);
                 Assert.NotNull(git);
 
                 var o = git.OpenObject(treeId);
@@ -128,17 +125,20 @@ namespace Gitty.Tests
 
         public IEnumerable<string> Trees()
         {
-            using (TestHelper.WorkingTree())
+            using (Test.WorkingTree())
             {
-                var result = TestHelper.Git.RevList("HEAD");
+                var result = Test.Git.RevList("HEAD");
                 var trees = new List<string>();
-
+                var i = 0;
                 using (var reader = new StringReader(result))
                 {
                     string line;
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = reader.ReadLine()) != null && i++ < 20)
                     {
-                        var commit = TestHelper.Git.CatFile("commit", line);
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue;
+
+                        var commit = Test.Git.CatFile("commit", line);
                         var lines = commit.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
                         var tree = lines[0].Substring(5);
                         yield return tree;

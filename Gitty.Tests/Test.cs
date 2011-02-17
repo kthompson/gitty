@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Gitty.Tests
 {
-    public static class TestHelper
+    public static class Test
     {
         public static readonly string ArtifactsPath = Path.Combine("..", "..", "Artifacts");
         public static readonly string ObjectsPath = Path.Combine(ArtifactsPath, "objects");
@@ -50,15 +50,19 @@ namespace Gitty.Tests
 
         public static string GetTempFolder(string prefix = "", int length = 40)
         {
-            var path = Path.Combine(Path.GetTempPath(), RandomString(prefix, length)) + Path.DirectorySeparatorChar;
+            var path = Path.Combine(Path.GetTempPath(), RandomString(prefix, length));// +Path.DirectorySeparatorChar;
             Directory.CreateDirectory(path);
             return path;
         }
 
         public static void AssertFileSystemsSame(string system1, string system2, string pattern = "*")
         {
-            var gitUri = new Uri(system2);
-            var msysGitUri = new Uri(system1);
+            system1 = NQ(system1);
+            system2 = NQ(system2);
+
+            var msysGitUri = GetUri(system1);
+
+            var gitUri = GetUri(system2);
 
             var msysGitEntries = Directory.EnumerateFileSystemEntries(system1, pattern, SearchOption.AllDirectories);
             var gitEntries = Directory.EnumerateFileSystemEntries(system2, pattern, SearchOption.AllDirectories);
@@ -77,6 +81,27 @@ namespace Gitty.Tests
             }
 
             Assert.IsFalse(enumerator.MoveNext());
+        }
+
+        private static Uri GetUri(string uri)
+        {
+            uri = EnsureSlash(uri);
+
+            return new Uri(uri);
+        }
+
+        private static string EnsureSlash(string uri)
+        {
+            if (!uri.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                uri += Path.DirectorySeparatorChar;
+
+            return uri;
+        }
+
+        private static string NQ(string s)
+        {
+            const string q = "\"";
+            return s.StartsWith(q) && s.EndsWith(q) ? s.Substring(1, s.Length - 2) : s;
         }
 
         public static void AssertFilesSame(string file1, string file2)
@@ -149,6 +174,11 @@ namespace Gitty.Tests
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public static string Q(string value)
+        {
+            return "\"" + value + "\"";
         }
 
         class Temp : IDisposable

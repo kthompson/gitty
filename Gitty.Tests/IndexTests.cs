@@ -14,7 +14,7 @@ namespace Gitty.Tests
         [Test]
         public void IndexHasValidHeader()
         {
-            var index = new Index(Path.Combine(TestHelper.ArtifactsPath, "index"));
+            var index = new Index(Path.Combine(Test.ArtifactsPath, "index"));
             Assert.AreEqual(83, index.EntryCount);
             Assert.AreEqual(2, index.Version);
         }
@@ -22,7 +22,7 @@ namespace Gitty.Tests
         [Test]
         public void IndexAlwaysHasSameEntryCount()
         {
-            var index = new Index(Path.Combine(TestHelper.ArtifactsPath, "index"));
+            var index = new Index(Path.Combine(Test.ArtifactsPath, "index"));
             Assert.AreEqual(83, index.EntryCount);
             Assert.AreEqual(83, index.Entries.Count());
             Assert.AreEqual(83, index.EntryCount);
@@ -34,7 +34,7 @@ namespace Gitty.Tests
         [Test,ExpectedException(typeof(InvalidOperationException))]
         public void IndexDoesntLikeNonIndexes()
         {
-            var index = new Index(Path.Combine(TestHelper.ObjectsPath, "blobs", "0f4a22329fb3970ca4c19d873623c68e937ba16c"));
+            var index = new Index(Path.Combine(Test.ObjectsPath, "blobs", "0f4a22329fb3970ca4c19d873623c68e937ba16c"));
             //force load
             var version = index.EntryCount;
         }

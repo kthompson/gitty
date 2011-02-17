@@ -11,7 +11,7 @@ namespace Gitty.Tests
     [TestFixture]
     public class PackTests
     {
-        public static readonly string PacksPath = Path.Combine(TestHelper.ArtifactsPath, "packs");
+        public static readonly string PacksPath = Path.Combine(Test.ArtifactsPath, "packs");
 
         public readonly string[] PackObjectIds = new[]
                                                      {
