@@ -148,9 +148,26 @@ namespace Gitty
         /// </summary>
         public void Dispose()
         {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if(!disposing)
+                return;
+            
             if (_stream != null)
                 _stream.Dispose();
+
             _stream = null;
+
+            if(_hash != null)
+                _hash.Dispose();
+
+            _hash = null;
+
+           
         }
     }
 }

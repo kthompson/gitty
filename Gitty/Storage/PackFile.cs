@@ -52,9 +52,11 @@ namespace Gitty.Storage
         {
             if (_loaded)
                 return;
-            
-            using (var reader = new BinaryReader(File.OpenRead(this.Location)))
+
+            using (var stream = File.OpenRead(this.Location))
             {
+                var reader = new BinaryReader(stream);
+            
                 var sig = reader.ReadBytes(4);
 
                 if (!(sig[0] == 'P' &&

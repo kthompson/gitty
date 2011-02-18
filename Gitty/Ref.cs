@@ -125,11 +125,13 @@ namespace Gitty
 
         private void LoadId()
         {
-            if (this.IsPacked) 
+            if (this.IsPacked)
                 return;
 
-            using (var reader = new StreamReader(File.OpenRead(this.Location)))
+            using (var stream = File.OpenRead(this.Location))
             {
+                var reader = new StreamReader(stream);
+
                 this.Id = reader.ReadToEnd().TrimEnd();
             }
         }

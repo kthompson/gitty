@@ -115,22 +115,24 @@ namespace Gitty
             if (_loaded)
                 return;
 
-            var stream = new MemoryStream(this.Data);
-
-            var bytesRead = 0;
-
-            while (bytesRead < this.Size)
+            using (var stream = new MemoryStream(this.Data))
             {
-                //read until space for mode
-                var mode = stream.ReadUntil(c => c == ' ');
-                bytesRead += mode.Length + 1;
-                var name = stream.ReadUntil(c => c == '\0');
-                bytesRead += name.Length + 1;
-                var entryId = stream.ReadId();
-                bytesRead += 20;
-                var entry = _storage.Read<TreeEntry>(entryId, this, name, mode);
 
-                this._items.Add(entry);
+                var bytesRead = 0;
+
+                while (bytesRead < this.Size)
+                {
+                    //read until space for mode
+                    var mode = stream.ReadUntil(c => c == ' ');
+                    bytesRead += mode.Length + 1;
+                    var name = stream.ReadUntil(c => c == '\0');
+                    bytesRead += name.Length + 1;
+                    var entryId = stream.ReadId();
+                    bytesRead += 20;
+                    var entry = _storage.Read<TreeEntry>(entryId, this, name, mode);
+
+                    this._items.Add(entry);
+                }
             }
 
             this._loaded = true;

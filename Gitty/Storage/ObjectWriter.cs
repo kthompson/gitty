@@ -12,23 +12,23 @@ namespace Gitty.Storage
         {
             using (var md = new MessageDigest())
             {
-                byte[] data;
-                var ms = new MemoryStream();
-
-                foreach (var item in tree.Items)
+                using (var ms = new MemoryStream())
                 {
-                    data = Encoding.Default.GetBytes(string.Format("{0} {1}\0", item.Mode, item.Name));
-                    ms.Write(data, 0, data.Length);
 
-                    data = Helper.IdToByteArray(item.Id);
-                    ms.Write(data, 0, data.Length);
+                    foreach (var item in tree.Items)
+                    {
+                        var data = Encoding.Default.GetBytes(string.Format("{0} {1}\0", item.Mode, item.Name));
+                        ms.Write(data, 0, data.Length);
+
+                        var id = Helper.IdToByteArray(item.Id);
+                        ms.Write(id, 0, id.Length);
+                    }
+
+                    var header = Encoding.Default.GetBytes(string.Format("tree {0}\0", ms.Length));
+
+                    md.Update(header);
+                    md.Update(ms);
                 }
-
-                data = Encoding.Default.GetBytes(string.Format("tree {0}\0", ms.Length));
-
-                md.Update(data);
-                md.Update(ms);
-                
                 var digest = md.Digest();
 
                 return Helper.ByteArrayToId(digest);

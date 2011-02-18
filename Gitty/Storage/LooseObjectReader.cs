@@ -61,11 +61,11 @@ namespace Gitty.Storage
             if (location == null)
                 return null;
 
+            var path = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
 
-            var inner = new FileStream(Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2)),
-                                       FileMode.Open, FileAccess.Read, FileShare.Read);
-            using (var stream = new CompressionStream(inner))
+            using (var inner = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
+                var stream = new CompressionStream(inner);
                 ObjectType type;
                 int size;
                 ReadHeader(stream, out type, out size);

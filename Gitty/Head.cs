@@ -79,8 +79,9 @@ namespace Gitty
         private void EnsureLoaded()
         {
             string data;
-            using (var reader = new StreamReader(File.OpenRead(this.Location)))
+            using (var stream = File.OpenRead(this.Location))
             {
+                var reader = new StreamReader(stream);
                 data = reader.ReadToEnd().TrimEnd();
             }
 

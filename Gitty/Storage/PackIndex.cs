@@ -87,10 +87,12 @@ namespace Gitty.Storage
             //TODO: we need to support 64bit offsets too
             this.EnsureLoaded();
 
-            using(var reader = new BinaryReader(File.OpenRead(this.Location)))
+            using (var stream = File.OpenRead(this.Location))
             {
+                var reader = new BinaryReader(stream);
+
                 PackIndexEntry entry;
-                if(_entries.TryGetValue(id, out entry))
+                if (_entries.TryGetValue(id, out entry))
                 {
                     reader.BaseStream.Seek(CrcOffset(entry), SeekOrigin.Begin);
                     var crc = reader.ReadBigEndianInt32();

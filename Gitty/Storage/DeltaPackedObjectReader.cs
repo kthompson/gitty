@@ -34,8 +34,13 @@ namespace Gitty.Storage
 
         public override void Load(ContentLoader contentLoader = null)
         {
-            if (contentLoader != null)
-                contentLoader(new MemoryStream(this.Data));
+            if (contentLoader == null) 
+                return;
+
+            using (var stream = new MemoryStream(this.Data))
+            {
+                contentLoader(stream);
+            }
         }
 
         private byte[] LoadData()
@@ -47,12 +52,10 @@ namespace Gitty.Storage
             {
                 file.Seek(this.DataOffset, SeekOrigin.Begin);
 
-                using(var stream = new CompressionStream(file, leaveOpen: true))
-                {
-                    var delta = new byte[this.RawSize];
-                    stream.Read(delta, 0, delta.Length);
-                    return BinaryDelta.Apply(baseData, delta);
-                }
+                var stream = new CompressionStream(file, leaveOpen: true);
+                var delta = new byte[this.RawSize];
+                stream.Read(delta, 0, delta.Length);
+                return BinaryDelta.Apply(baseData, delta);
             }
         }
     }
