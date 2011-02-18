@@ -135,8 +135,6 @@ namespace Gitty.Tests
             {
                 using (var f2 = stream2)
                 {
-                    
-
                     while (true)
                     {
                         var i = f1.ReadByte();
@@ -179,8 +177,6 @@ namespace Gitty.Tests
             Environment.SetEnvironmentVariable("GIT_WORK_TREE", workingTree ?? WorkingDirectory, EnvironmentVariableTarget.Process);
             return new Temp(() => Environment.SetEnvironmentVariable("GIT_WORK_TREE", string.Empty, EnvironmentVariableTarget.Process));
         }
-
-
 
         public static string ReadToEndOfStream(Stream stream)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -37,11 +38,13 @@ namespace Gitty
             return obj == null ? null : tryMethod(obj);
         }
 
+        [DebuggerHidden]
         public static int ReadBigEndianInt32(this BinaryReader reader)
         {
             return IPAddress.HostToNetworkOrder(reader.ReadInt32());
         }
 
+        [DebuggerHidden]
         public static short ReadBigEndianInt16(this BinaryReader reader)
         {
             return IPAddress.HostToNetworkOrder(reader.ReadInt16());
