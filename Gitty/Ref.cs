@@ -4,29 +4,89 @@ using System.IO;
 namespace Gitty
 {
 
+    /// <summary>
+    /// Used to represent the different types of Refs
+    /// </summary>
     public enum RefType
     {
+        /// <summary>
+        /// Head/Branches
+        /// </summary>
         Head,
+        /// <summary>
+        /// Tags
+        /// </summary>
         Tag,
+        /// <summary>
+        /// Remotes
+        /// </summary>
         Remote
     }
 
+    /// <summary>
+    /// Object used to represent the named pointers to commits in the repo(Refs).
+    /// </summary>
     public sealed class Ref
     {
-        public static readonly string Refs = "refs";
-        public static readonly string Heads = "heads";
-        public static readonly string Remotes = "remotes";
-        public static readonly string Tags = "tags";
+        /// <summary>
+        /// Constant for Refs path
+        /// </summary>
+        public const string Refs = "refs";
+        /// <summary>
+        /// Constant for Heads path
+        /// </summary>
+        public const string Heads = "heads";
+        /// <summary>
+        /// Constant for Remotes path
+        /// </summary>
+        public const string Remotes = "remotes";
+        /// <summary>
+        /// Constant for Tags path
+        /// </summary>
+        public const string Tags = "tags";
 
-        
+
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// Gets the name of the remote.
+        /// </summary>
+        /// <value>
+        /// The name of the remote.
+        /// </value>
         public string RemoteName { get; private set; }
+        /// <summary>
+        /// Gets a value indicating whether this instance is packed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is packed; otherwise, <c>false</c>.
+        /// </value>
         public bool IsPacked { get; private set; }
+        /// <summary>
+        /// Gets the type of ref.
+        /// </summary>
         public RefType Type { get; private set; }
+        /// <summary>
+        /// Gets the id that the ref points to.
+        /// </summary>
         public string Id { get; private set; }
+        /// <summary>
+        /// Gets the relative path or "Git" name.
+        /// </summary>
         public string RelativePath { get; private set; }
+        /// <summary>
+        /// Gets the location of the ref.
+        /// </summary>
         public string Location { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Ref"/> class.
+        /// </summary>
+        /// <param name="refsLocation">The refs location.</param>
+        /// <param name="location">The location.</param>
+        /// <param name="id">The id.</param>
         public Ref(string refsLocation, string location, string id = null)
         {
             this.Location = location;

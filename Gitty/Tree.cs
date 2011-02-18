@@ -7,9 +7,15 @@ using Gitty.Storage;
 
 namespace Gitty
 {
+    /// <summary>
+    /// Represents the git object Tree that is used to represent folders
+    /// </summary>
     public class Tree : TreeEntry
     {
         private readonly ObjectStorage _storage;
+        /// <summary>
+        /// Gets the size.
+        /// </summary>
         public long Size { get; private set; }
 
         internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
@@ -20,6 +26,9 @@ namespace Gitty
             this._loader = loader.Try(n => new Lazy<byte[]>(loader));
         }
 
+        /// <summary>
+        /// Gets the ObjectType.
+        /// </summary>
         public override ObjectType Type
         {
             get
@@ -29,18 +38,30 @@ namespace Gitty
         }
 
         private string _id;
+        /// <summary>
+        /// Gets or sets the id.
+        /// </summary>
+        /// <value>
+        /// The SHA1 id of the object.
+        /// </value>
         public override string Id
         {
             get { return base.Id ?? _id ?? (_id = ObjectWriter.ComputeId(this)); }
         }
 
         private readonly Lazy<byte[]> _loader;
+        /// <summary>
+        /// Gets the data.
+        /// </summary>
         public byte[] Data
         {
             get { return _loader.Value; }
         }
 
         private readonly List<TreeEntry> _items = new List<TreeEntry>();
+        /// <summary>
+        /// Gets the items in the tree.
+        /// </summary>
         public virtual IEnumerable<TreeEntry> Items
         {
             get
@@ -74,6 +95,11 @@ namespace Gitty
             } while (stack.Count > 0);
         }
 
+        /// <summary>
+        /// Enumerates the items in the tree.
+        /// </summary>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <returns></returns>
         public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
         {
             if (!recursive)

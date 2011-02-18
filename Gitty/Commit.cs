@@ -5,12 +5,19 @@ using Gitty.Storage;
 
 namespace Gitty
 {
+    /// <summary>
+    /// Represents the Commit objects in git.
+    /// </summary>
     public class Commit : AbstractObject
     {
         private readonly ObjectStorage _storage;
         private readonly ObjectReader _reader;
 
         private Tree _tree;
+
+        /// <summary>
+        /// Gets the tree that this commit points to.
+        /// </summary>
         public Tree Tree
         {
             get
@@ -21,6 +28,9 @@ namespace Gitty
         }
 
         private readonly List<Commit> _parents;
+        /// <summary>
+        /// Gets parent commits, if any exist.
+        /// </summary>
         public Commit[] Parents
         {
             get
@@ -31,6 +41,9 @@ namespace Gitty
         }
 
         private string _commiter;
+        /// <summary>
+        /// Gets the commiter name and email address.
+        /// </summary>
         public string Commiter
         {
             get
@@ -41,6 +54,9 @@ namespace Gitty
         }
 
         private string _author;
+        /// <summary>
+        /// Gets the author name and email address.
+        /// </summary>
         public string Author
         {
             get
@@ -51,6 +67,9 @@ namespace Gitty
         }
 
         private string _message;
+        /// <summary>
+        /// Gets the message of the commit.
+        /// </summary>
         public string Message
         {
             get
@@ -114,6 +133,9 @@ namespace Gitty
             this._loaded = true;
         }
 
+        /// <summary>
+        /// Gets the ObjectType.
+        /// </summary>
         public override ObjectType Type
         {
             get { return ObjectType.Commit; }

@@ -4,16 +4,42 @@ using System.IO;
 
 namespace Gitty.Storage
 {
+    /// <summary>
+    /// A <see cref="PackFile"/> Index for fast lookup of objects
+    /// </summary>
     public class PackIndex
     {
+        /// <summary>
+        /// Gets the location.
+        /// </summary>
         public string Location { get; private set; }
 
+        /// <summary>
+        /// Gets the size.
+        /// </summary>
         public int Size { get; private set; }
+        /// <summary>
+        /// Gets the fanout table offset.
+        /// </summary>
         public int FanoutTableOffset { get; private set; }
+        /// <summary>
+        /// Gets the sha table offset.
+        /// </summary>
         public int ShaTableOffset { get; private set; }
+        /// <summary>
+        /// Gets the CRC table offset.
+        /// </summary>
         public int CrcTableOffset { get; private set; }
+        /// <summary>
+        /// Gets the offset table offset.
+        /// </summary>
         public int OffsetTableOffset {get; private set;}
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackIndex"/> class.
+        /// </summary>
+        /// <param name="location">The location.</param>
+        /// <param name="size">The size.</param>
         public PackIndex(string location, int size)
         {
             this.Location = location;
@@ -50,10 +76,15 @@ namespace Gitty.Storage
                 _loaded = true;
             }
         }
-
-        //TODO: we need to support 64bit offsets too
+        
+        /// <summary>
+        /// Gets the PackIndexEntry from the index.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns></returns>
         public PackIndexEntry GetEntry(string id)
         {
+            //TODO: we need to support 64bit offsets too
             this.EnsureLoaded();
 
             using(var reader = new BinaryReader(File.OpenRead(this.Location)))
@@ -84,6 +115,13 @@ namespace Gitty.Storage
             return OffsetTableOffset + entry.Index * 4;
         }
 
+        /// <summary>
+        /// Determines whether the specified id exists in the index.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified id has entry; otherwise, <c>false</c>.
+        /// </returns>
         public bool HasEntry(string id)
         {
             this.EnsureLoaded();
@@ -100,14 +138,36 @@ namespace Gitty.Storage
             return FanoutTableOffset + fanoutIndex * 4;
         }
 
+        /// <summary>
+        /// Represent an entry in a <see cref="PackIndex"/>.
+        /// </summary>
         public class PackIndexEntry
         {
+            /// <summary>
+            /// Gets the id.
+            /// </summary>
             public string Id { get; private set; }
+            /// <summary>
+            /// Gets the index.
+            /// </summary>
             public int Index { get; private set; }
+            /// <summary>
+            /// Gets the CRC.
+            /// </summary>
             public int Crc { get; private set; }
+            /// <summary>
+            /// Gets the offset.
+            /// </summary>
             public int Offset { get; private set; }
 
-            public PackIndexEntry(string id, int index, int crc, int offset)
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PackIndexEntry"/> class.
+            /// </summary>
+            /// <param name="id">The id.</param>
+            /// <param name="index">The index.</param>
+            /// <param name="crc">The CRC.</param>
+            /// <param name="offset">The offset.</param>
+            internal PackIndexEntry(string id, int index, int crc, int offset)
             {
                 this.Id = id;
                 this.Index = index;

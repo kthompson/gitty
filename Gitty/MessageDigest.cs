@@ -43,11 +43,17 @@ using System.IO;
 
 namespace Gitty
 {
+    /// <summary>
+    /// MessageDigest class used to calculate SHA1 ids.
+    /// </summary>
     public class MessageDigest : IDisposable
     {
         private CryptoStream _stream;
         private SHA1Managed _hash;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageDigest"/> class.
+        /// </summary>
         public MessageDigest()
         {
             Init();
@@ -59,6 +65,10 @@ namespace Gitty
             _stream = new CryptoStream(Stream.Null, _hash, CryptoStreamMode.Write);
         }
 
+        /// <summary>
+        /// Gets the result of the calculation.
+        /// </summary>
+        /// <returns></returns>
         public byte[] Digest()
         {
             try
@@ -72,6 +82,11 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Gets the result of a calculation that has a simple input.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns></returns>
         public static byte[] Digest(byte[] input)
         {
             using (var me = new MessageDigest())
@@ -81,37 +96,61 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Resets this instance for reuse.
+        /// </summary>
         public void Reset()
         {
             Dispose();
             Init();
         }
 
+        /// <summary>
+        /// Updates the calculation with the specified input.
+        /// </summary>
+        /// <param name="input">The input.</param>
         public void Update(byte input)
         {
             _stream.WriteByte(input);
         }
 
+        /// <summary>
+        /// Updates the calculation with the specified input.
+        /// </summary>
+        /// <param name="input">The input.</param>
         public void Update(byte[] input)
         {
             this.Update(input, 0, input.Length);
         }
 
+        /// <summary>
+        /// Updates the calculation with the specified input.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="count">The count.</param>
         public void Update(byte[] input, int index, int count)
         {
             _stream.Write(input, index, count);
         }
 
+        /// <summary>
+        /// Updates the calculation with the specified input.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        public void Update(Stream stream)
+        {
+            stream.CopyTo(_stream);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             if (_stream != null)
                 _stream.Dispose();
             _stream = null;
-        }
-
-        public void Update(Stream stream)
-        {
-            stream.CopyTo(_stream);
         }
     }
 }

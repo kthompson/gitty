@@ -6,15 +6,30 @@ using Gitty.Storage;
 
 namespace Gitty
 {
+    /// <summary>
+    /// Represents an object in a Tree
+    /// </summary>
     public abstract class TreeEntry : AbstractObject
     {
+        /// <summary>
+        /// Gets the mode.
+        /// </summary>
         public string Mode { get; private set; }
 
+        /// <summary>
+        /// Gets the parent.
+        /// </summary>
         public Tree Parent { get; private set; }
 
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
         public string Name { get; private set; }
 
         private string _fullName;
+        /// <summary>
+        /// Gets the full name.
+        /// </summary>
         public string FullName
         {
             get

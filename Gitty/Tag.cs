@@ -4,6 +4,9 @@ using Gitty.Storage;
 
 namespace Gitty
 {
+    /// <summary>
+    /// Tag object
+    /// </summary>
     public class Tag : AbstractObject
     {
         private readonly ObjectStorage _storage;
@@ -17,6 +20,9 @@ namespace Gitty
         }
 
         private string _name;
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
         public string Name
         {
             get
@@ -27,6 +33,12 @@ namespace Gitty
         }
 
         private string _type;
+        /// <summary>
+        /// Gets the type of the object.
+        /// </summary>
+        /// <value>
+        /// The type of the object.
+        /// </value>
         public string ObjectType
         {
             get
@@ -37,6 +49,9 @@ namespace Gitty
         }
 
         private AbstractObject _object;
+        /// <summary>
+        /// Gets the object.
+        /// </summary>
         public AbstractObject Object
         {
             get
@@ -47,6 +62,9 @@ namespace Gitty
         }
 
         private string _tagger;
+        /// <summary>
+        /// Gets the tagger.
+        /// </summary>
         public string Tagger
         {
             get
@@ -57,6 +75,9 @@ namespace Gitty
         }
 
         private string _message;
+        /// <summary>
+        /// Gets the message.
+        /// </summary>
         public string Message
         {
             get
@@ -115,6 +136,9 @@ namespace Gitty
             this._message = new string(buffer, 0, read);
         }
 
+        /// <summary>
+        /// Gets the ObjectType.
+        /// </summary>
         public override ObjectType Type
         {
             get { return Gitty.ObjectType.Tag; }

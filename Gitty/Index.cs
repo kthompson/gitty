@@ -7,9 +7,15 @@ using System.Text;
 
 namespace Gitty
 {
+    /// <summary>
+    /// A class that represents the Index of objects to be added to the repository.
+    /// </summary>
     public class Index
     {
         private int _entryCount;
+        /// <summary>
+        /// Gets the number of entries.
+        /// </summary>
         public int EntryCount
         {
             get
@@ -20,6 +26,9 @@ namespace Gitty
         }
 
         private int _version;
+        /// <summary>
+        /// Gets the index version.
+        /// </summary>
         public int Version
         {
             get
@@ -29,14 +38,24 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Gets the location of .git/index.
+        /// </summary>
         public string Location { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Index"/> class.
+        /// </summary>
+        /// <param name="location">The location.</param>
         public Index(string location)
         {
             this.Location = location;
         }
 
         private readonly List<IndexEntry> _entries = new List<IndexEntry>();
+        /// <summary>
+        /// Gets the entries.
+        /// </summary>
         public IEnumerable<IndexEntry> Entries
         {
             get
@@ -46,6 +65,12 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance has unmerged paths.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance has unmerged paths; otherwise, <c>false</c>.
+        /// </value>
         public bool HasUnmergedPaths
         {
             get { throw new NotImplementedException(); }

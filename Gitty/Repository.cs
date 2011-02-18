@@ -6,8 +6,14 @@ using Gitty.Storage;
 
 namespace Gitty
 {
+    /// <summary>
+    /// Object to represent a Git repository
+    /// </summary>
     public class Repository
     {
+        /// <summary>
+        /// Gets the working directory location.
+        /// </summary>
         public string WorkingDirectoryLocation { get; private set; }
 
         internal Repository(string workingDirectory = null, string gitDirectory = null, bool create = false)
@@ -90,55 +96,95 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Gets the remotes.
+        /// </summary>
         public IEnumerable<Ref> Remotes
         {
             get { return this._refStorage.Remotes; }
         }
 
+        /// <summary>
+        /// Gets the refs.
+        /// </summary>
         public IEnumerable<Ref> Refs
         {
             get { return this._refStorage.Refs; }
         }
 
+        /// <summary>
+        /// Gets the heads.
+        /// </summary>
         public IEnumerable<Ref> Heads
         {
             get { return this._refStorage.Heads; }
         }
 
+        /// <summary>
+        /// Gets the branches.
+        /// </summary>
         public IEnumerable<Ref> Branches
         {
             get { return this._refStorage.Branches; }
         }
 
+        /// <summary>
+        /// Gets the tags.
+        /// </summary>
         public IEnumerable<Ref> Tags
         {
             get { return this._refStorage.Tags; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is bare.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is bare; otherwise, <c>false</c>.
+        /// </value>
         public bool IsBare
         {
             get { return this.WorkingDirectoryLocation == null; }
         }
 
+        /// <summary>
+        /// Gets the location of the repo.
+        /// </summary>
         public string Location { get; private set; }
-        
+
+        /// <summary>
+        /// Gets the hooks location.
+        /// </summary>
         public string HooksLocation { get; private set; }
+
+        /// <summary>
+        /// Gets the info location.
+        /// </summary>
         public string InfoLocation { get; private set; }
 
         internal ObjectStorage ObjectStorage { get; private set; }
 
         private readonly RefStorage _refStorage;
 
+        /// <summary>
+        /// Gets the head.
+        /// </summary>
         public Head Head
         {
             get { return new Head(this); }
         }
 
+        /// <summary>
+        /// Gets the index.
+        /// </summary>
         public Index Index
         {
             get{ return new Index(Path.Combine(this.Location, "index"));}
         }
 
+        /// <summary>
+        /// Gets the status.
+        /// </summary>
         public Status Status
         {
             get
@@ -147,6 +193,9 @@ namespace Gitty
             }
         }
 
+        /// <summary>
+        /// Gets the state.
+        /// </summary>
         public RepositoryState State
         {
             get
@@ -190,9 +239,15 @@ namespace Gitty
             }
         }
 
-        //TODO: we should remove this as we should only have access through other fields
+        /// <summary>
+        /// Opens the object.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns></returns>
+        [Obsolete]
         public AbstractObject OpenObject(string id)
         {
+            //TODO: we should remove this as we should only have access through other fields
             return this.ObjectStorage.Read(id);
         }
     }
