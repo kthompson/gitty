@@ -12,32 +12,25 @@ namespace Gitty
     /// </summary>
     public class Tree : TreeEntry
     {
-        private readonly ObjectStorage _storage;
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        public long Size { get; private set; }
-
-        internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
-            : base(id, parent, name, mode)
-        {
-            this.Size = size;
-            this._storage = storage;
-            this._loader = loader.Try(n => new Lazy<byte[]>(loader));
-        }
-
-        /// <summary>
-        /// Gets the ObjectType.
-        /// </summary>
-        public override ObjectType Type
-        {
-            get
-            {
-                return ObjectType.Tree;
-            }
-        }
+        #region Private Variables 
 
         private string _id;
+
+        private readonly List<TreeEntry> _items = new List<TreeEntry>();
+
+        private bool _loaded;
+        private readonly Lazy<byte[]> _loader;
+        private readonly ObjectStorage _storage;
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the data.
+        /// </summary>
+        public byte[] Data
+        {
+            get { return _loader.Value; }
+        }
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
@@ -48,17 +41,6 @@ namespace Gitty
         {
             get { return base.Id ?? _id ?? (_id = ObjectWriter.ComputeId(this)); }
         }
-
-        private readonly Lazy<byte[]> _loader;
-        /// <summary>
-        /// Gets the data.
-        /// </summary>
-        public byte[] Data
-        {
-            get { return _loader.Value; }
-        }
-
-        private readonly List<TreeEntry> _items = new List<TreeEntry>();
         /// <summary>
         /// Gets the items in the tree.
         /// </summary>
@@ -70,45 +52,31 @@ namespace Gitty
                 return _items.AsReadOnly();
             }
         }
-
-        private static IEnumerable<TreeEntry> RecursiveTreeEnumerator(Tree tree)
-        {
-            var stack = new Stack<IEnumerator<TreeEntry>>();
-            stack.Push(tree.Items.GetEnumerator());
-
-            do
-            {
-                var enumerator = stack.Pop();
-                while (enumerator.MoveNext())
-                {
-                    if (enumerator.Current.Type == ObjectType.Tree)
-                    {
-                        stack.Push(enumerator);
-                        enumerator = ((Tree) enumerator.Current).Items.GetEnumerator();
-                    }
-                    else
-                    {
-                        yield return enumerator.Current;
-                    }
-                }
-                
-            } while (stack.Count > 0);
-        }
+        /// <summary>
+        /// Gets the size.
+        /// </summary>
+        public long Size { get; private set; }
 
         /// <summary>
-        /// Enumerates the items in the tree.
+        /// Gets the ObjectType.
         /// </summary>
-        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
-        /// <returns></returns>
-        public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
+        public override ObjectType Type
         {
-            if (!recursive)
-                return this.Items;
-
-            return RecursiveTreeEnumerator(this);
+            get { return ObjectType.Tree; }
         }
+        #endregion
 
-        private bool _loaded;
+        #region Constructors
+        internal Tree(ObjectStorage storage ,string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
+            : base(id, parent, name, mode)
+        {
+            this.Size = size;
+            this._storage = storage;
+            this._loader = loader.Try(n => new Lazy<byte[]>(loader));
+        }
+        #endregion         
+
+        #region Private Methods
 
         private void EnsureLoaded()
         {
@@ -137,5 +105,44 @@ namespace Gitty
 
             this._loaded = true;
         }
+        private static IEnumerable<TreeEntry> RecursiveTreeEnumerator(Tree tree)
+        {
+            var stack = new Stack<IEnumerator<TreeEntry>>();
+            stack.Push(tree.Items.GetEnumerator());
+
+            do
+            {
+                var enumerator = stack.Pop();
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current.Type == ObjectType.Tree)
+                    {
+                        stack.Push(enumerator);
+                        enumerator = ((Tree) enumerator.Current).Items.GetEnumerator();
+                    }
+                    else
+                    {
+                        yield return enumerator.Current;
+                    }
+                }
+                
+            } while (stack.Count > 0);
+        }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Enumerates the items in the tree.
+        /// </summary>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <returns></returns>
+        public IEnumerable<TreeEntry> EnumerateItems(bool recursive = false)
+        {
+            if (!recursive)
+                return this.Items;
+
+            return RecursiveTreeEnumerator(this);
+        }
+        #endregion
     }
 }

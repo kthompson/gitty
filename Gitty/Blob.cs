@@ -11,20 +11,24 @@ namespace Gitty
     /// </summary>
     public class Blob : TreeEntry
     {
+        #region Constructors
         internal Blob(string id, long size, Func<byte[]> loader, Tree parent = null, string name = null, string mode = null)
             : base(id, parent, name, mode)
         {
             _loader = new Lazy<byte[]>(loader);
             this.Size = size;
         }
+        #endregion
+
+        #region Properties
 
         /// <summary>
-        /// Gets the size of the blob.
+        /// Gets the data of the object.
         /// </summary>
-        public long Size { get; private set; }
-
-        private string _id;
-
+        public byte[] Data
+        {
+            get { return _loader.Value; }
+        }
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
@@ -35,15 +39,10 @@ namespace Gitty
         {
             get { return base.Id ?? _id ?? (_id = ObjectWriter.ComputeId(this)); }
         }
-
-        private readonly Lazy<byte[]> _loader;
         /// <summary>
-        /// Gets the data of the object.
+        /// Gets the size of the blob.
         /// </summary>
-        public byte[] Data
-        {
-            get { return _loader.Value; }
-        }
+        public long Size { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ObjectType"/>.
@@ -52,5 +51,12 @@ namespace Gitty
         {
             get { return ObjectType.Blob; }
         }
+        #endregion
+
+        #region Private Variables
+        private string _id;
+
+        private readonly Lazy<byte[]> _loader;
+        #endregion
     }
 }

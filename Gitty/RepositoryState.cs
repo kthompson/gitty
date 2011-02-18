@@ -10,6 +10,7 @@ namespace Gitty
     /// </summary>
     public class RepositoryState
     {
+        #region Properties
         /// <summary>
         /// Gets a value indicating whether this instance can checkout.
         /// </summary>
@@ -18,13 +19,6 @@ namespace Gitty
         /// </value>
         public bool CanCheckout { get; private set; }
         /// <summary>
-        /// Gets a value indicating whether this instance can reset the head.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance can reset head; otherwise, <c>false</c>.
-        /// </value>
-        public bool CanResetHead { get; private set; }
-        /// <summary>
         /// Gets a value indicating whether this instance can commit.
         /// </summary>
         /// <value>
@@ -32,10 +26,19 @@ namespace Gitty
         /// </value>
         public bool CanCommit { get; private set; }
         /// <summary>
+        /// Gets a value indicating whether this instance can reset the head.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance can reset head; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanResetHead { get; private set; }
+        /// <summary>
         /// Gets the description.
         /// </summary>
         public string Description { get; private set; }
+        #endregion
 
+        #region Constructors
         private RepositoryState(bool canCheckout, bool canResetHead,bool canCommit, string description)
         {
             this.CanCheckout = canCheckout;
@@ -43,6 +46,9 @@ namespace Gitty
             this.CanCommit = canCommit;
             this.Description = description;
         }
+        #endregion
+
+        #region RepositoryStates
 
         /// <summary>
         /// Bare repository
@@ -84,5 +90,6 @@ namespace Gitty
         /// Repository is bisecting
         /// </summary>
         public static readonly RepositoryState Bisecting = new RepositoryState(true, false, true, "Bisecting");
+        #endregion
     }
 }

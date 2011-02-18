@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) 2007, Robin Rosenberg <robin.rosenberg@dewire.com>
  * Copyright (C) 2007, Shawn O. Pearce <spearce@spearce.org>
- * Copyright (C) 2008, Kevin Thompson <kevin.thompson@theautomaters.com>
+ * Copyright (C) 2011, Kevin Thompson <kevin.thompson@theautomaters.com>
  *
  * All rights reserved.
  *
@@ -46,7 +46,7 @@ namespace Gitty
     /// <para />
     /// This entire class is heavily cribbed from <code>patch-delta.c</code> in the
     /// GIT project. The original delta patching code was written by Nicolas Pitre
-    /// (&lt;nico@cam.org&gt;).
+    /// (<nico@cam.org>).
     /// </summary>
     public static class BinaryDelta
     {

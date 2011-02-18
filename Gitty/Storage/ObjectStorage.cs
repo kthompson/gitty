@@ -8,11 +8,28 @@ namespace Gitty.Storage
 {
     class ObjectStorage
     {
-        public string ObjectsLocation { get; private set; }
-        public string PacksLocation { get; private set; }
+        #region Properties
         public string InfoLocation { get; private set; }
+        public string ObjectsLocation { get; private set; }
 
+        public IEnumerable<PackFile> PackFiles
+        {
+            get
+            {
+                //TODO we should be holding on to these pack file instances
+                var packs = new DirectoryInfo(this.PacksLocation);
+                if (packs.Exists)
+                    return packs
+                        .EnumerateFiles("*.pack")
+                        .Select(pf => new PackFile(pf.FullName));
 
+                return new PackFile[] { };
+            }
+        }
+        public string PacksLocation { get; private set; }
+        #endregion
+        
+        #region Constructors
         public ObjectStorage(string gitLocation, bool create)
         {
             this.ObjectsLocation = Path.Combine(gitLocation, "objects");
@@ -29,21 +46,7 @@ namespace Gitty.Storage
             //.git/objects/info
             Directory.CreateDirectory(this.InfoLocation);
         }
-
-        public IEnumerable<PackFile> PackFiles
-        {
-            get
-            {
-                //TODO we should be holding on to these pack file instances
-                var packs = new DirectoryInfo(this.PacksLocation);
-                if (packs.Exists)
-                    return packs
-                        .EnumerateFiles("*.pack")
-                        .Select(pf => new PackFile(pf.FullName));
-
-                return new PackFile[] { };
-            }
-        }
+        #endregion
 
         #region readers
 
@@ -154,10 +157,5 @@ namespace Gitty.Storage
             throw new NotImplementedException();
         }
         #endregion
-
-        #region helper methods
-
-        #endregion
-
     }
 }

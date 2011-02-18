@@ -11,11 +11,7 @@ namespace Gitty
     /// </summary>
     public class Repository
     {
-        /// <summary>
-        /// Gets the working directory location.
-        /// </summary>
-        public string WorkingDirectoryLocation { get; private set; }
-
+        #region Constructors
         internal Repository(string workingDirectory = null, string gitDirectory = null, bool create = false)
         {
             if (workingDirectory != null)
@@ -34,6 +30,8 @@ namespace Gitty
 
             this.Location = Helper.MakeAbsolutePath(gitDirectory);
 
+            this.IndexLocation = Path.Combine(this.Location, "index");
+
             this.InfoLocation = Path.Combine(this.Location, "info");
 
             this.HooksLocation = Path.Combine(this.Location, "hooks");
@@ -43,10 +41,12 @@ namespace Gitty
             this.ObjectStorage = new ObjectStorage(this.Location, create);
             this._refStorage = new RefStorage(this.Location, create);
         }
+        #endregion
 
+        #region Private Methods
         private void CreateGitDirectory(bool create)
         {
-            if (!create) 
+            if (!create)
                 return;
 
             //.git
@@ -57,7 +57,7 @@ namespace Gitty
             EmbeddedToFile(configfile, Path.Combine(this.Location, "config"));
             EmbeddedToFile("Gitty.Content.description", Path.Combine(this.Location, "description"));
             EmbeddedToFile("Gitty.Content.HEAD", Path.Combine(this.Location, "HEAD"));
-            
+
             //.git/hooks/
             Directory.CreateDirectory(this.HooksLocation);
             EmbeddedHookToFile("applypatch-msg.sample");
@@ -81,7 +81,7 @@ namespace Gitty
         {
             EmbeddedToFile("Gitty.Content.hooks." + file, Path.Combine(this.HooksLocation, file));
         }
-
+        
         private static void EmbeddedToFile(string resource, string file)
         {
             using (var stream = File.Create(file))
@@ -95,23 +95,37 @@ namespace Gitty
                 }
             }
         }
+        #endregion
+
+        #region Private Variables
+        private readonly RefStorage _refStorage;
+
+        internal ObjectStorage ObjectStorage { get; private set; }
+        #endregion
+
+        #region Properties
 
         /// <summary>
-        /// Gets the remotes.
+        /// Gets the branches.
         /// </summary>
-        public IEnumerable<Ref> Remotes
+        public IEnumerable<Ref> Branches
         {
-            get { return this._refStorage.Remotes; }
+            get
+            {
+                return this._refStorage.Branches;
+            }
         }
 
         /// <summary>
-        /// Gets the refs.
+        /// Gets the head.
         /// </summary>
-        public IEnumerable<Ref> Refs
+        public Head Head
         {
-            get { return this._refStorage.Refs; }
+            get
+            {
+                return new Head(this);
+            }
         }
-
         /// <summary>
         /// Gets the heads.
         /// </summary>
@@ -120,22 +134,32 @@ namespace Gitty
             get { return this._refStorage.Heads; }
         }
 
-        /// <summary>
-        /// Gets the branches.
-        /// </summary>
-        public IEnumerable<Ref> Branches
-        {
-            get { return this._refStorage.Branches; }
-        }
 
         /// <summary>
-        /// Gets the tags.
+        /// Gets the hooks location.
         /// </summary>
-        public IEnumerable<Ref> Tags
-        {
-            get { return this._refStorage.Tags; }
-        }
+        public string HooksLocation { get; private set; }
 
+
+        /// <summary>
+        /// Gets the index.
+        /// </summary>
+        public Index Index
+        {
+            get
+            {
+                return new Index(this.IndexLocation);
+            }
+        }
+        /// <summary>
+        /// Gets the index location.
+        /// </summary>
+        public string IndexLocation { get; private set; }
+
+        /// <summary>
+        /// Gets the info location.
+        /// </summary>
+        public string InfoLocation { get; private set; }
         /// <summary>
         /// Gets a value indicating whether this instance is bare.
         /// </summary>
@@ -151,47 +175,21 @@ namespace Gitty
         /// Gets the location of the repo.
         /// </summary>
         public string Location { get; private set; }
-
         /// <summary>
-        /// Gets the hooks location.
+        /// Gets the refs.
         /// </summary>
-        public string HooksLocation { get; private set; }
-
-        /// <summary>
-        /// Gets the info location.
-        /// </summary>
-        public string InfoLocation { get; private set; }
-
-        internal ObjectStorage ObjectStorage { get; private set; }
-
-        private readonly RefStorage _refStorage;
-
-        /// <summary>
-        /// Gets the head.
-        /// </summary>
-        public Head Head
+        public IEnumerable<Ref> Refs
         {
-            get { return new Head(this); }
+            get { return this._refStorage.Refs; }
+        }
+        /// <summary>
+        /// Gets the remotes.
+        /// </summary>
+        public IEnumerable<Ref> Remotes
+        {
+            get { return this._refStorage.Remotes; }
         }
 
-        /// <summary>
-        /// Gets the index.
-        /// </summary>
-        public Index Index
-        {
-            get{ return new Index(Path.Combine(this.Location, "index"));}
-        }
-
-        /// <summary>
-        /// Gets the status.
-        /// </summary>
-        public Status Status
-        {
-            get
-            {
-                return new Status(this);
-            }
-        }
 
         /// <summary>
         /// Gets the state.
@@ -200,7 +198,7 @@ namespace Gitty
         {
             get
             {
-                if(this.IsBare)
+                if (this.IsBare)
                     return RepositoryState.Bare;
 
                 if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, ".dotest")))
@@ -226,7 +224,7 @@ namespace Gitty
 
                 if (File.Exists(Path.Combine(this.WorkingDirectoryLocation, "MERGE_HEAD")))
                 {
-                    if(this.Index.HasUnmergedPaths)
+                    if (this.Index.HasUnmergedPaths)
                         return RepositoryState.Merging;
 
                     return RepositoryState.MergingResolved;
@@ -240,6 +238,30 @@ namespace Gitty
         }
 
         /// <summary>
+        /// Gets the status.
+        /// </summary>
+        public Status Status
+        {
+            get
+            {
+                return new Status(this);
+            }
+        }
+        /// <summary>
+        /// Gets the tags.
+        /// </summary>
+        public IEnumerable<Ref> Tags
+        {
+            get { return this._refStorage.Tags; }
+        }
+        /// <summary>
+        /// Gets the working directory location.
+        /// </summary>
+        public string WorkingDirectoryLocation { get; private set; }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
         /// Opens the object.
         /// </summary>
         /// <param name="id">The id.</param>
@@ -250,5 +272,6 @@ namespace Gitty
             //TODO: we should remove this as we should only have access through other fields
             return this.ObjectStorage.Read(id);
         }
+        #endregion
     }
 }
