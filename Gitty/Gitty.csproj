@@ -77,6 +77,7 @@
     <Compile Include="BinaryDelta.cs" />
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="MessageDigest.cs" />
     <Compile Include="RefStorage.cs" />
     <Compile Include="Storage\DeltaPackedObjectReader.cs" />
