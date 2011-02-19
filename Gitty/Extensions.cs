@@ -134,5 +134,106 @@ namespace Gitty
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Reads from the stream until the predicate is satisfied or EndOfStream is reached.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns></returns>
+        public static string ReadUntil(this TextReader reader, Predicate<int> predicate)
+        {
+            var sb = new StringBuilder();
+            while (true)
+            {
+                var c = reader.Peek();
+                if (predicate(c) || c == -1)
+                    return sb.ToString();
+
+                sb.Append((char)reader.Read());
+            }
+        }
+
+        /// <summary>
+        /// Reads from the stream while the predicate is satisfied or EndOfStream is reached.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns></returns>
+        public static string ReadWhile(this TextReader reader, Predicate<char> predicate)
+        {
+            var sb = new StringBuilder();
+            while (true)
+            {
+                var c = reader.Peek();
+                if (c == -1)
+                    return sb.ToString();
+
+                if (predicate((char) c))
+                    sb.Append((char) reader.Read());
+                else
+                    return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Skips bytes in the stream while the predicate is satisfied or EndOfStream is reached.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="predicate">The predicate.</param>
+        public static void SkipWhile(this TextReader reader, Predicate<int> predicate)
+        {
+            while (true)
+            {
+                var c = reader.Peek();
+                if (c == -1)
+                    return;
+
+                if (predicate(c))
+                    reader.Read();
+                else
+                    return;
+            }
+        }
+
+        /// <summary>
+        /// Skips bytes in the stream until the predicate is satisfied or EndOfStream is reached.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="predicate">The predicate.</param>
+        public static void SkipUntil(this TextReader reader, Predicate<int> predicate)
+        {
+            while (true)
+            {
+                var c = reader.Peek();
+                if (predicate(c) || c == -1)
+                    return;
+
+                reader.Read();
+            }
+        }
+
+
+        /// <summary>
+        /// Reads a character and peeks the next.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <returns></returns>
+        public static int ReadAndPeek(this TextReader reader)
+        {
+            reader.Read();
+            return reader.Peek();
+        }
+
+        /// <summary>
+        /// Casts the specified object to the generic type parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o">The o.</param>
+        /// <returns></returns>
+        public static T Cast<T>(this object o)
+        {
+            return (T)o;
+        }
     }
 }
