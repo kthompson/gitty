@@ -49,7 +49,8 @@ namespace Gitty
             get
             {
                 this.EnsureLoaded();
-                return _items.AsReadOnly();
+                return _items
+                    .OrderBy(entry => entry.Name + (entry.Type == ObjectType.Tree  ? "/" : ""), StringComparer.Ordinal);
             }
         }
         /// <summary>

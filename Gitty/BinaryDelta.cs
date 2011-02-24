@@ -46,7 +46,7 @@ namespace Gitty
     /// <para />
     /// This entire class is heavily cribbed from <code>patch-delta.c</code> in the
     /// GIT project. The original delta patching code was written by Nicolas Pitre
-    /// (<nico@cam.org>).
+    /// (nico@cam.org).
     /// </summary>
     public static class BinaryDelta
     {

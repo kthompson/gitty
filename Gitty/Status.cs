@@ -24,7 +24,7 @@ namespace Gitty
         /// <summary>
         /// Gets the index tree.
         /// </summary>
-        public Tree IndexTree { get; private set; }
+        public Index Index { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Status"/> class.
@@ -39,21 +39,60 @@ namespace Gitty
 
             this.WorkingTree = new WorkingTreeDirectory(dir);
             this.HeadTree = this._repository.Head.Tree;
-            this.IndexTree = this._repository.Head.Tree;
+            this.Index = this._repository.Index;
+
+            this.BuildEntries();
         }
 
+        private void BuildEntries()
+        {
+            var workingTreeFiles = this.WorkingTree.EnumerateItems(true);
+            var headFiles = this.HeadTree.EnumerateItems(true);
+            var indexFiles = this.Index.Entries;
 
-        //private IEnumerable<string> Changed { get; private set; }
+            var query = from wtree in workingTreeFiles
+                        join headFile in headFiles on wtree.FullName equals headFile.FullName into gj
+                        from headFileOrNull in gj.DefaultIfEmpty()
+                        select new { WorkingTreeEntry = wtree, HeadEntry = headFileOrNull };
 
-        //not in Index, HEAD or Ignored
-        //private IEnumerable<string> Untracked { get; private set; }
+            var entries = query.ToList();
+        }
 
+        ///<summary>
+        /// Changed but not updated
+        /// 
+        /// HEAD:   v1
+        /// Index:  v1
+        /// WT:     v2
+        ///</summary>
+        public IEnumerable<string> Changed { get; private set; }
 
-        //private IEnumerable<string> Ignored { get; private set; }
+        ///<summary>
+        /// Files that are not in the repository yet.
+        /// 
+        /// HEAD:   none
+        /// Index:  none
+        /// WT:     v1
+        ///</summary>
+        public IEnumerable<string> Untracked { get; private set; }
 
+        ///<summary>
+        /// Files that are in the working tree but ignored
+        /// 
+        /// HEAD:   none
+        /// Index:  none
+        /// WT:     none
+        ///</summary>
+        public IEnumerable<string> Ignored { get; private set; }
 
-        //private IEnumerable<string> Updated { get; private set; }
-        //private IEnumerable<string> Unmerged { get; private set; }
-        //private IEnumerable<string> Changed { get; private set; }
+        ///<summary>
+        /// Changes to be committed
+        /// 
+        /// HEAD:   none
+        /// Index:  none
+        /// WT:     none
+        ///</summary>
+        public IEnumerable<string> Updated { get; private set; }
+
     }
 }

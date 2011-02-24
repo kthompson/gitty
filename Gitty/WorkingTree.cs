@@ -26,7 +26,14 @@ namespace Gitty
 
         public override IEnumerable<TreeEntry> Items
         {
-            get { return this.Directory.EnumerateFileSystemInfos().Select(FileSystemInfoToWorkingTree); }
+            get
+            {
+                return this.Directory.EnumerateFileSystemInfos()
+                    .OrderBy(fsi => fsi.Name + (fsi is DirectoryInfo ? "/" : ""), StringComparer.Ordinal)
+                    .Where(fsi => fsi.Name != ".git")
+                    .Where(fsi => NotIgnored(null, fsi))
+                    .Select(FileSystemInfoToWorkingTree);
+            }
         }
 
         private TreeEntry FileSystemInfoToWorkingTree(FileSystemInfo info)
@@ -45,8 +52,11 @@ namespace Gitty
 
         private static string ModeFromFileSystemInfo(FileSystemInfo info)
         {
-            //TODO implement Mode From FileSystemInfo
-            return "10644";
+            if (info is DirectoryInfo)
+                return "40000";
+            
+            //if is executable 100755 but windows doesnt have a way to detect this
+            return "100644";
         }
 
         public static bool NotIgnored(Repository repo, FileSystemInfo info)

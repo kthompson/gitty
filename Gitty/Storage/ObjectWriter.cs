@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,6 @@ namespace Gitty.Storage
             {
                 using (var ms = new MemoryStream())
                 {
-
                     foreach (var item in tree.Items)
                     {
                         var data = Encoding.Default.GetBytes(string.Format("{0} {1}\0", item.Mode, item.Name));
@@ -22,10 +22,11 @@ namespace Gitty.Storage
 
                         var id = Helper.IdToByteArray(item.Id);
                         ms.Write(id, 0, id.Length);
+                        Debug.WriteLine(string.Format("{0} {1}\t{2}", item.Mode, item.Id, item.Name));
                     }
 
                     var header = Encoding.Default.GetBytes(string.Format("tree {0}\0", ms.Length));
-
+                    ms.Position = 0;
                     md.Update(header);
                     md.Update(ms);
                 }

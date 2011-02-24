@@ -81,7 +81,9 @@
     <Compile Include="IndexTests.cs" />
     <Compile Include="MSysGit.cs" />
     <Compile Include="ObjectTests.cs" />
+    <Compile Include="ObjectWriterTests.cs" />
     <Compile Include="PackTests.cs" />
+    <Compile Include="StatusTests.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="SampleRepoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
