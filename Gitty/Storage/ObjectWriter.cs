@@ -25,6 +25,22 @@ namespace Gitty.Storage
                         Debug.WriteLine(string.Format("{0} {1}\t{2}", item.Mode, item.Id, item.Name));
                     }
 
+                    if (((WorkingTreeDirectory)tree).Directory.Name == "deflate")
+                    {
+                        try
+                        {
+                            var path = Path.GetTempFileName();
+                            using (var ufile = File.Create(path))
+                            {
+                                ms.Position = 0;
+                                ms.CopyTo(ufile);
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            e.ToString();
+                        }
+                    }
                     var header = Encoding.Default.GetBytes(string.Format("tree {0}\0", ms.Length));
                     ms.Position = 0;
                     md.Update(header);
@@ -50,25 +66,5 @@ namespace Gitty.Storage
                 return Helper.ByteArrayToId(digest);
             }
         }
-
-        //private static string CalculateId(WorkingTreeFile file)
-        //{
-        //    using (var md = new MessageDigest())
-        //    {
-        //        byte[] data = Encoding.Default.GetBytes(string.Format("blob {0}\0", file.Length));
-
-        //        md.Update(data);
-
-        //        using (var stream = file.OpenRead())
-        //        {
-        //            md.Update(stream);
-        //        }
-
-        //        var digest = md.Digest();
-
-        //        return Helper.ByteArrayToId(digest);
-        //    }
-        //}
-        
     }
 }
