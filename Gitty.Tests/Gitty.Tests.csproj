@@ -77,7 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigTests.cs" />
+    <Compile Include="GitIgnoreTests.cs" />
     <Compile Include="GitTests.cs" />
+    <Compile Include="HeadTests.cs" />
     <Compile Include="IndexTests.cs" />
     <Compile Include="MSysGit.cs" />
     <Compile Include="ObjectTests.cs" />
@@ -87,6 +89,8 @@
     <Compile Include="Test.cs" />
     <Compile Include="SampleRepoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestBlob.cs" />
+    <Compile Include="TestTree.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gitty\Gitty.csproj">

@@ -22,25 +22,8 @@ namespace Gitty.Storage
 
                         var id = Helper.IdToByteArray(item.Id);
                         ms.Write(id, 0, id.Length);
-                        Debug.WriteLine(string.Format("{0} {1}\t{2}", item.Mode, item.Id, item.Name));
                     }
 
-                    if (((WorkingTreeDirectory)tree).Directory.Name == "deflate")
-                    {
-                        try
-                        {
-                            var path = Path.GetTempFileName();
-                            using (var ufile = File.Create(path))
-                            {
-                                ms.Position = 0;
-                                ms.CopyTo(ufile);
-                            }
-                        }
-                        catch(Exception e)
-                        {
-                            e.ToString();
-                        }
-                    }
                     var header = Encoding.Default.GetBytes(string.Format("tree {0}\0", ms.Length));
                     ms.Position = 0;
                     md.Update(header);

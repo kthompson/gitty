@@ -47,7 +47,7 @@ using NUnit.Framework;
 namespace Gitty.Tests
 {
     [TestFixture]
-    public class RepositoryConfigTest
+    public class ConfigTests
     {
         [Test]
         public void Test001ReadBareKey()
@@ -278,6 +278,16 @@ namespace Gitty.Tests
                     + "\n"
                     + "[core-section-not-to-remove-in-test]\n"
                     + "  packedGitLimit = 14\n", c.ToString());
+        }
+
+
+        [Test, ExpectedException(typeof(InvalidConfigException))]
+        public void ShouldThrowOnInvalidSection()
+        {
+            Parse("" //
+                    + "[branch \"keep\"\n"
+                    + "  merge = master.branch.to.keep.in.the.file\n"
+                    + "  packedGitLimit = 14\n");
         }
 
         private static Config Parse(string content)

@@ -81,6 +81,7 @@
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="GitIgnore.cs" />
     <Compile Include="MessageDigest.cs" />
     <Compile Include="RefStorage.cs" />
     <Compile Include="Storage\DeltaPackedObjectReader.cs" />

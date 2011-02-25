@@ -44,13 +44,24 @@ namespace Gitty
         /// <summary>
         /// Gets the items in the tree.
         /// </summary>
-        public virtual IEnumerable<TreeEntry> Items
+        public IEnumerable<TreeEntry> Items
+        {
+            get
+            {
+
+                return this.ItemsInternal.OrderBy(entry => entry.Name + (entry.Type == ObjectType.Tree ? "/" : ""), StringComparer.Ordinal);
+            }
+        }
+
+        /// <summary>
+        /// Gets the items internally.
+        /// </summary>
+        protected virtual IEnumerable<TreeEntry> ItemsInternal
         {
             get
             {
                 this.EnsureLoaded();
-                return _items
-                    .OrderBy(entry => entry.Name + (entry.Type == ObjectType.Tree  ? "/" : ""), StringComparer.Ordinal);
+                return _items;
             }
         }
         /// <summary>

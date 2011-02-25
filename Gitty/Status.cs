@@ -38,7 +38,7 @@ namespace Gitty
             var dir = new DirectoryInfo(_repository.WorkingDirectoryLocation);
 
             this.WorkingTree = new WorkingTreeDirectory(dir);
-            this.HeadTree = this._repository.Head.Tree;
+            this.HeadTree = this._repository.Head.Commit.Tree;
             this.Index = this._repository.Index;
 
             this.BuildEntries();

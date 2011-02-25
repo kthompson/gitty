@@ -43,22 +43,22 @@ namespace Gitty.Tests
             }
         }
 
-        [Test]
-        public void DecompressTest()
-        {
-            using (Test.WorkingTree())
-            {
-                var file = Path.Combine(Test.WorkingDirectory, "011940f3815a5fd9079afb14279248ffb584ac88");
-                var outfile = Path.Combine(Test.WorkingDirectory, "011940f3815a5fd9079afb14279248ffb584ac88_uncompressed");
-                using (var cfile = new CompressionStream(file))
-                {
-                    using (var ufile = File.OpenWrite(outfile))
-                    {
-                        cfile.CopyTo(ufile);
-                    }
-                }
-            }
-        }
+        //[Test]
+        //public void DecompressTest()
+        //{
+        //    using (Test.WorkingTree())
+        //    {
+        //        var file = Path.Combine(Test.WorkingDirectory, "011940f3815a5fd9079afb14279248ffb584ac88");
+        //        var outfile = Path.Combine(Test.WorkingDirectory, "011940f3815a5fd9079afb14279248ffb584ac88_uncompressed");
+        //        using (var cfile = new CompressionStream(file))
+        //        {
+        //            using (var ufile = File.OpenWrite(outfile))
+        //            {
+        //                cfile.CopyTo(ufile);
+        //            }
+        //        }
+        //    }
+        //}
 
         public IEnumerable<TestCaseData> Trees()
         {

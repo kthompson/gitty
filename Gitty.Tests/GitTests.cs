@@ -128,7 +128,6 @@ namespace Gitty.Tests
             using (Test.WorkingTree())
             {
                 var result = Test.Git.RevList("HEAD");
-                var trees = new List<string>();
                 var i = 0;
                 using (var reader = new StringReader(result))
                 {
@@ -137,6 +136,9 @@ namespace Gitty.Tests
                     {
                         if (string.IsNullOrWhiteSpace(line))
                             continue;
+                        
+                        if(i++ > 5)
+                            yield break;
 
                         var commit = Test.Git.CatFile("commit", line);
                         var lines = commit.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);

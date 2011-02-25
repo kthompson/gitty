@@ -57,13 +57,16 @@ namespace Gitty
             }
         }
 
-        private Tree _tree;
+        private Commit _commit;
         /// <summary>
-        /// Gets the tree that we are pointing to.
+        /// Gets the commit that this head is pointing to.
         /// </summary>
-        public Tree Tree
+        public Commit Commit
         {
-            get { return _tree ?? (_tree = this.Repository.ObjectStorage.Read<Tree>(this.Id)); }
+            get
+            {
+                return _commit ?? (_commit = this.Repository.ObjectStorage.Read<Commit>(this.Id));
+            }
         }
 
         /// <summary>

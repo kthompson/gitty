@@ -24,15 +24,11 @@ namespace Gitty
             
         }
 
-        public override IEnumerable<TreeEntry> Items
+        protected override IEnumerable<TreeEntry> ItemsInternal
         {
             get
             {
-                return this.Directory.EnumerateFileSystemInfos()
-                    .OrderBy(fsi => fsi.Name + (fsi is DirectoryInfo ? "/" : ""), StringComparer.Ordinal)
-                    .Where(fsi => fsi.Name != ".git")
-                    .Where(fsi => NotIgnored(null, fsi))
-                    .Select(FileSystemInfoToWorkingTree);
+                return this.Directory.EnumerateFileSystemInfos().Select(FileSystemInfoToWorkingTree);
             }
         }
 
