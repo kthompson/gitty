@@ -48,7 +48,6 @@ namespace Gitty
         {
             get
             {
-
                 return this.ItemsInternal.OrderBy(entry => entry.Name + (entry.Type == ObjectType.Tree ? "/" : ""), StringComparer.Ordinal);
             }
         }

@@ -66,10 +66,7 @@ namespace Gitty.Storage
         {
             var reader = CreateReader(id);
             if (reader == null)
-            {
-                type = ObjectType.Undefined;
-                return null;
-            }
+                return ReadWithoutStorage(id, parent, name, mode, out type);
 
             type = reader.Type;
 
@@ -88,6 +85,33 @@ namespace Gitty.Storage
                 default:
                     throw new NotSupportedException(string.Format("Object Type ({0}) for object ({1}) not supported at this time.", reader.Type, id));
             }
+        }
+
+        private static AbstractObject ReadWithoutStorage(string id, Tree parent, string name, string mode, out ObjectType type)
+        {
+            TreeEntry entry = null;
+            if (!string.IsNullOrEmpty(mode))
+            {
+                var modeValue = FileMode.FromOctal(mode);
+
+                if (FileMode.IsGitLink(modeValue))
+                {
+                    entry = new GitLink(id, parent, name);
+                }
+                else if (FileMode.IsSymlink(modeValue))
+                {
+                    entry = new Symlink(id, parent, name);
+                }
+            }
+
+            if(entry != null)
+            {
+                type = entry.Type;
+                return entry;
+            }
+
+            type = ObjectType.Undefined;
+            return null;
         }
 
         private Tag CreateTag(string id, ObjectReader reader)

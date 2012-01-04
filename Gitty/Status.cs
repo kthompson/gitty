@@ -27,6 +27,14 @@ namespace Gitty
         public Index Index { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether this is the initial commit.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is initial commit; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsInitialCommit { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Status"/> class.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -46,16 +54,58 @@ namespace Gitty
 
         private void BuildEntries()
         {
-            var workingTreeFiles = this.WorkingTree.EnumerateItems(true);
-            var headFiles = this.HeadTree.EnumerateItems(true);
-            var indexFiles = this.Index.Entries;
+            /*	
+                wt_status_collect_changes_worktree(s);
 
-            var query = from wtree in workingTreeFiles
-                        join headFile in headFiles on wtree.FullName equals headFile.FullName into gj
-                        from headFileOrNull in gj.DefaultIfEmpty()
-                        select new { WorkingTreeEntry = wtree, HeadEntry = headFileOrNull };
+                if (s->is_initial)
+                    wt_status_collect_changes_initial(s);
+                else
+                    wt_status_collect_changes_index(s);
+                wt_status_collect_untracked(s);
+             */
+            var indexEntries = this.Index.Entries.ToDictionary(entry => entry.Name);
+            var headEnties = this.HeadTree.EnumerateItems(true).ToDictionary(entry => entry.FullName);
 
-            var entries = query.ToList();
+            foreach (var wtFile in this.WorkingTree.EnumerateItems(true))
+            {
+                var name = wtFile.FullName;
+                var indexEntry = PopItem(indexEntries, name);
+                var headEntry = PopItem(headEnties, name);
+
+                var isNew = headEntry == null;
+                var untracked = headEntry == null && indexEntry == null;
+                var added = headEntry == null && indexEntry != null;
+
+
+                //if(index == null)
+                //{
+                    
+                //}
+            }
+
+            //var query = from wtree in workingTreeFiles
+            //            join indexEntry in this.Index.Entries on wtree.FullName equals indexEntry.Name into gj
+            //            from headFileOrNull in gj.DefaultIfEmpty()
+            //            select new { WorkingTreeEntry = wtree, HeadEntry = headFileOrNull };
+
+            //var entries = query.ToList();
+        }
+
+        private static T PopItem<T>(Dictionary<string, T> indexEntries, string key)
+             where T : class
+        {
+            T indexEntry = null;
+            if (indexEntries.ContainsKey(key))
+            {
+                indexEntry = indexEntries[key];
+                indexEntries.Remove(key);
+            }
+            return indexEntry;
+        }
+
+        class StatusEntry
+        {
+            
         }
 
         ///<summary>

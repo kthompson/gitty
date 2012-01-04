@@ -121,8 +121,8 @@ namespace Gitty.Tests
         public static void AssertFilesSame(string file1, string file2)
         {
             // open first file 
-            var stream1 = new FileStream(file1, FileMode.Open);
-            var stream2 = new FileStream(file2, FileMode.Open);
+            var stream1 = new FileStream(file1, System.IO.FileMode.Open);
+            var stream2 = new FileStream(file2, System.IO.FileMode.Open);
 
             Assert.AreEqual(stream1.Length, stream2.Length);
             

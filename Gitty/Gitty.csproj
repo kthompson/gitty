@@ -81,7 +81,9 @@
     <Compile Include="Commit.cs" />
     <Compile Include="CompressionStream.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="FileMode.cs" />
     <Compile Include="GitIgnore.cs" />
+    <Compile Include="GitLink.cs" />
     <Compile Include="MessageDigest.cs" />
     <Compile Include="RefStorage.cs" />
     <Compile Include="Storage\DeltaPackedObjectReader.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Repository.cs" />
     <Compile Include="RepositoryState.cs" />
     <Compile Include="Status.cs" />
+    <Compile Include="Symlink.cs" />
     <Compile Include="Tag.cs" />
     <Compile Include="Tree.cs" />
     <Compile Include="TreeEntry.cs" />

@@ -19,7 +19,7 @@ namespace Gitty
 
         private static FileStream OpenFile(string fileLocation)
         {
-            return new FileStream(fileLocation, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return new FileStream(fileLocation, System.IO.FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
         public CompressionStream(string fileLocation, CompressionMode mode = CompressionMode.Decompress, bool leaveOpen = false)

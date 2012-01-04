@@ -63,7 +63,7 @@ namespace Gitty.Storage
 
             var path = Path.Combine(objectsLocation, id.Substring(0, 2), id.Substring(2));
 
-            using (var inner = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var inner = new FileStream(path, System.IO.FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var stream = new CompressionStream(inner);
                 ObjectType type;
