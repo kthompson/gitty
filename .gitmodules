@@ -1,0 +1,3 @@
+[submodule "Gitty.VisualStudio"]
+	path = Gitty.VisualStudio
+	url = git@github.com:kthompson/Gitty.VisualStudio.git
