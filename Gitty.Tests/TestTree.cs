@@ -53,7 +53,9 @@ namespace Gitty.Tests
             }
         }
 
-        public IEnumerator<TreeEntry> GetEnumerator()
+        #region these two methods are utility methods to expose the Collection Initializer ie collection.Add. See: GitIgnoreTests.ShouldIgnoreFile for example
+
+        public IEnumerator<TestTreeEntry> GetEnumerator()
         {
             throw new NotImplementedException();
         }
@@ -62,5 +64,6 @@ namespace Gitty.Tests
         {
             return GetEnumerator();
         }
+        #endregion
     }
 }

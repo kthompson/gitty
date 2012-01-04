@@ -8,8 +8,13 @@ namespace Gitty.Tests
     class TestBlob : Blob
     {
         internal TestBlob(Tree parent, string name)
-            : base(null, 0, null, parent, name)
+            : base(null, 0, EmptyLoader, parent, name)
         {
+        }
+
+        private static byte[] EmptyLoader()
+        {
+            return new byte[]{};
         }
     }
 }

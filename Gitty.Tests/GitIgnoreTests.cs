@@ -39,7 +39,10 @@ namespace Gitty.Tests
 
             var expectedEntries = new[] { "files/file1", "files/file2", "root/hi", "root/readme.txt" };
             var i = 0;
-            foreach(var entry in root.EnumerateItems(true))
+            var items = root.EnumerateItems(true).ToArray();
+
+            Assert.AreEqual(expectedEntries.Length, items.Length, "Number of Entries");
+            foreach(var entry in items)
             {
                 Assert.AreEqual(expectedEntries[i++], entry.FullName);
             }
