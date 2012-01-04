@@ -12,7 +12,7 @@ namespace Gitty
         {
         }
 
-        public void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
+        public virtual void GetContentStream(Action<Stream, IObjectInfo> contentLoader)
         {
             this.Loader.Load(stream => contentLoader(stream, this.Loader));
         }
